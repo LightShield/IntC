@@ -1,0 +1,20 @@
+name: ringbuffer-cegis-skip-1024
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+harnesses:
+  - file: harness_floor.c
+    entry: harness
+    unwind: 1
+    note: >
+      CAPACITY >= 2048 is Post, not I. Closest is_pow2 value 1024 is a
+      counterexample. CEGIS must exclude it and try 2048.
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+    note: FIFO at K=4 after the floor holds.
+budget: {}
+verify_timeout_s: 120

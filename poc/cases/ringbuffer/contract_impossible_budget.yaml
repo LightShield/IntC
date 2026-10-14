@@ -1,0 +1,15 @@
+name: ringbuffer-impossible-budget
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+    note: FIFO at K=4. Budget is below the compiled baseline, so A is empty and P1 is still emitted.
+budget:
+  static_memory_bytes: 100
+verify_timeout_s: 120

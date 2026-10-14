@@ -1,0 +1,24 @@
+# Fat particle Euler — PARSEC/Godot-scale record, prove small / measure large
+#
+# Why this I/Post: after one step, position is previous plus velocity times dt.
+# Layout is not in the index API. Harness N ≤ 4. Benchmark defines N=100000
+# before including the candidate (`#ifndef N` in the source).
+# pad0–pad3 fatten the AoS record; they are not in Post. They are there so
+# the layout rewrite has a cache effect on a 64-byte particle.
+name: particle-fat-aos
+baseline: baseline.c
+parameters:
+  - name: N
+    bits: 32
+    constraints: ["N >= 2", "N <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+    note: Kinematics on at most four particles. Storage N is overridden in bench.c.
+budget: {}
+objective:
+  metric: ns_per_update
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 60

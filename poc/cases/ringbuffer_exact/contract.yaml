@@ -1,0 +1,23 @@
+name: ringbuffer-physical-slack
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1000"]
+  - name: STORAGE
+    bits: 64
+    constraints: ["STORAGE >= CAPACITY", "STORAGE <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 12
+    defines: {K: "10"}
+    note: >
+      FIFO order and fullness at logical CAPACITY (not STORAGE) for every
+      sequence of up to K operations from an empty queue.
+budget: {}
+objective:
+  metric: ns_per_op
+  bench: bench.c
+  trials: 15
+verify_timeout_s: 300

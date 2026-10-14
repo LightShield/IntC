@@ -1,0 +1,19 @@
+name: ringbuffer-tight-memory
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+    note: FIFO up to K=4 (enough to admit the mask candidate before the budget check)
+budget:
+  static_memory_bytes: 8016
+objective:
+  metric: ns_per_op
+  bench: bench.c
+  trials: 3
+verify_timeout_s: 120

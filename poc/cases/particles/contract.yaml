@@ -1,0 +1,18 @@
+# Particle Euler step — PARSEC fluidanimate kinematics, integer
+#
+# Why this I/Post: after one step, position is previous plus velocity times dt.
+# Layout of the particle record is not in the index API, so AoS vs SoA is slack.
+# N is a small BMC bound, not a remainder.
+name: particle-aos-kinematics
+baseline: baseline.c
+parameters:
+  - name: N
+    bits: 32
+    constraints: ["N >= 2", "N <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+    note: One kinematics step on at most four particles. N is in I, not a remainder.
+budget: {}
+verify_timeout_s: 60

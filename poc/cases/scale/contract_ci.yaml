@@ -1,0 +1,12 @@
+name: integer-gain-mul-shift-ci
+baseline: baseline.c
+parameters:
+  - name: GAIN
+    bits: 32
+    constraints: ["GAIN >= 8", "GAIN <= 16"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 1
+budget: {}
+verify_timeout_s: 60

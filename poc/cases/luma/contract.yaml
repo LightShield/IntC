@@ -1,0 +1,23 @@
+# Rec. 601 luma — OpenCV-style float MAC vs Q15
+#
+# Why this I/Post: 8-bit gray may differ from the Q15 integerization by at
+# most 1. NPX is the BMC pixel count (4). Post is that Q15 formula, not the
+# float Rec. 601 sum in P1. The float coefficients are incidental.
+# The timed bench is 1920x1080, outside models_K.
+name: bt601-luma
+baseline: baseline.c
+parameters:
+  - name: NPX
+    bits: 32
+    constraints: ["NPX >= 4", "NPX <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+    note: Four pixels. Post is |Y - Q15| <= 1.
+budget: {}
+objective:
+  metric: ns_per_pixel
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 60

@@ -1,0 +1,13 @@
+name: ringbuffer-contradictory-I
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 2000", "CAPACITY <= 1000"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+budget: {}
+verify_timeout_s: 30

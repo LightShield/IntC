@@ -1,0 +1,21 @@
+# Transform-space tag packing — OGRE Node
+#
+# Why this contract: scene-graph commands only distinguish three spaces.
+# The developer does not need a 32-bit tag. Narrowing `space` to uint8_t keeps
+# the same comparisons (0,1,2) and shrinks the struct. Post is the scale rule
+# (world doubles the x component; local/parent leave it).
+#
+# Assumptions: N=4, space in {0,1,2}, integer x. No float Vector3, no C++ enum.
+name: ogre-transform-space
+baseline: baseline.c
+parameters:
+  - name: N
+    bits: 32
+    constraints: ["N >= 4", "N <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+    note: eval_x is x if space!=2 and 2*x if space==2.
+budget: {}
+verify_timeout_s: 60

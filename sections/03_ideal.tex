@@ -1,0 +1,314 @@
+\section{The Ideal Problem}
+\label{sec:ideal}
+
+This section defines the compilation problem: a contract over observable
+behavior, the programs that satisfy it, and an objective that picks a cheapest
+one. Leroy's preservation of a
+specification~\cite[\S2.1]{leroy2009backend} and the refinement
+calculi~\cite{back1998refinement,morgan1994programming} are the setting. Named
+implementation parameters, a taxonomy of slack, that objective, and then a
+split between the functional contract and the optimization contract make the
+problem specific enough to compile against.
+
+The definitions apply to any language with a deterministic sequential semantics
+and a notion of observable behavior. The running examples are in C, and the
+as-if rule and undefined behavior are the same in C++.
+
+\subsection{Programs and the As-If Rule}
+\label{sec:setting}
+
+Let \(\Sigma\) be the set of initial states of a program, covering its inputs
+and initial memory. Running program \(P\) on \(\sigma \in \Sigma\) has one of
+three results. It may terminate in a final state \(\sigma'\) after producing a
+trace \(\tau \in \mathcal{T}\) of observable events, written
+\(\langle P, \sigma \rangle \Downarrow (\sigma', \tau)\). It may run forever,
+written \(\mathsf{div}\). Or it may reach an operation whose meaning the
+language leaves undefined, written \(\mathsf{ub}\). We write
+\(\llbracket P \rrbracket(\sigma)\) for the result.
+
+In C and C++, the observable behavior consists of I/O and accesses to volatile
+objects~\cite[\S4.1.2]{n4950}. Local values, the order of intermediate
+computations, and unescaped layout are not observable, so comparisons use only
+those observable parts.
+
+\begin{definition}[Observational Equivalence]
+\(P_1 \approx P_2\) iff \(\llbracket P_1 \rrbracket(\sigma)\) and
+\(\llbracket P_2 \rrbracket(\sigma)\) have the same observable part for every
+\(\sigma \in \Sigma\). We write \([P]_\approx\) for the set of programs
+observationally equivalent to \(P\).
+\end{definition}
+
+\([P]_\approx\) is the space a conventional optimizing compiler may search.
+Undefined behavior loosens this slightly: on inputs where the source is
+undefined, the compiled program may do anything~\cite{lopes2021alive2,
+lee2017taming}.
+
+\subsection{Named Parameters and Functional Contracts}
+\label{sec:contract}
+
+Implementation parameters are named constants in the source, written
+\(\theta_P\). The set of names is part of the contract. Extracting
+\(\theta_P\) is syntactic: a \texttt{\#define} capacity, not a property of
+\(\llbracket P \rrbracket\). Two observationally equivalent programs may
+differ in \(\theta\). The contract is indexed by \(\theta\), so
+\(\mathit{Post}_\theta\) can depend on the capacity the implementation chose.
+
+\begin{definition}[Functional Intent Contract]
+\label{def:contract}
+A functional intent contract is a triple
+\[
+\Phi_{\text{func}} = \langle \mathit{Pre}, \mathit{Post}, \mathcal{I} \rangle
+\]
+where \(\mathit{Pre} \subseteq \Sigma\) is the set of initial states the
+program must handle, \(\mathcal{I}\) is the set of acceptable parameter
+valuations, and \(\mathit{Post}\) gives, for each \(\theta \in \mathcal{I}\),
+a relation \(\mathit{Post}_\theta\) between an initial state and the
+acceptable observable results.
+Program \(P\) satisfies \(\Phi_{\text{func}}\), written
+\(P \models \Phi_{\text{func}}\), iff \(\theta_P \in \mathcal{I}\) and
+\[
+\forall \sigma \in \mathit{Pre}.\ \exists \sigma', \tau.\
+\langle P, \sigma \rangle \Downarrow (\sigma', \tau)
+\ \wedge\ (\sigma, (\sigma', \tau)) \in \mathit{Post}_{\theta_P}.
+\]
+\end{definition}
+
+The triple follows Design by Contract~\cite{meyer1988eiffel}.
+Satisfaction requires termination without undefined behavior on every input
+in \(\mathit{Pre}\), and the contract mentions only observable results. The
+set of satisfying programs is
+\(\mathrm{Sat}(\Phi_{\text{func}}) = \{P \mid P \models \Phi_{\text{func}}\}\).
+We write \(P_1 \sim_{\Phi_{\text{func}}} P_2\) when both lie in that set.
+
+Each component states one kind of intent. \(\mathit{Pre}\) states which
+inputs matter. \(\mathcal{I}\) states acceptable parameter valuations, so a
+queue that must absorb bursts of 800 packets with 25\% headroom has
+\(\mathcal{I} = \{\theta \mid \theta_{\mathrm{cap}} \ge 1000\}\).
+\(\mathit{Post}_\theta\) states what the program must do, relative to the
+parameters it chose: enqueued packets come out in order, and an enqueue fails
+exactly when \(\theta_{\mathrm{cap}}\) packets are stored.
+
+\begin{definition}[Realizability]
+\(\Phi_{\text{func}}\) is vacuous if \(\mathit{Pre} = \emptyset\). It is
+contradictory if no parameter valuation, input, and result jointly satisfy
+\(\mathit{Post}\). It is realizable if there exists \(\theta \in \mathcal{I}\)
+such that every \(\sigma \in \mathit{Pre}\) has at least one acceptable
+result under \(\mathit{Post}_\theta\).
+\end{definition}
+
+Vacuous contracts are rejected before search: they have empty
+\(\mathit{Pre}\). A contract whose \(\mathit{Post}\) no program can satisfy
+is discovered later, when no candidate is proved. Realizability is the
+\(\forall\sigma\,\exists o\) condition.
+
+\subsection{Slack}
+\label{sec:slack}
+
+\(\mathrm{Sat}(\Phi_{\text{func}})\) differs from \([P]_\approx\) where the
+contract leaves a decision open. There are four ways to leave one open.
+
+\begin{itemize}
+  \item \emph{Input slack.} \(\mathit{Pre} \neq \Sigma\). On excluded inputs
+  any behavior is acceptable. This is the kind undefined behavior already
+  provides, and the kind SeGaBench grants by fixing a valid-input
+  domain~\cite{jiang2026segabench}.
+  \item \emph{Output slack.} For some covered input, \(\mathit{Post}_\theta\)
+  accepts two distinct observable results. A process-ID allocator must return
+  an unused ID, or \(\texttt{NONE}\) when every ID is in use. Scanning from
+  ID 1, and continuing from a cursor, both satisfy that, and they return
+  different IDs once an ID below the cursor has been freed. No conventional
+  compiler may replace one by the other.
+  \item \emph{Logical-parameter slack.} The contract accepts several
+  parameter valuations, and the choice is visible in the results. Queues of
+  capacity 1000 and 1024 reject a full-queue enqueue at different points. Both
+  are acceptable when \(\mathcal{I}\) requires only a capacity of at least
+  1000.
+  \item \emph{Unexposed slack.} Extra resources or a different representation
+  that the interface does not expose. A queue that allocates 1024 slots and
+  still becomes full at 1000 uses a power-of-two mask while preserving
+  caller-facing capacity. Folly and DPDK's exact-size rings are this
+  case~\cite{folly_pcq,dpdk_rte_ring}. If the extra cells and the mask are
+  unobservable at the API, the as-if rule may already permit the change,
+  provided the analysis can see it. The contract still has to license the
+  extra memory, which is a budget concern
+  (\S\ref{sec:opt_contract}).
+\end{itemize}
+
+Input and output slack are don't-cares in Karnaugh's sense: an incompletely
+specified function can be minimized by assigning combinations the
+specification leaves open~\cite{karnaugh1953map}.
+Logical-parameter slack and unexposed slack concern the implementation
+rather than unspecified I/O. The first is a named parameter visible in the
+results, and the second is extra store or a representation the interface
+does not name.
+
+The four kinds of slack are properties of \(\Phi_{\text{func}}\). Whether
+\(\mathrm{Sat}(\Phi_{\text{func}})\) is larger than \([P]_\approx\) is
+settled by local patching.
+
+A language supports \emph{local patching} if for every program \(P\), state
+\(\sigma_0\), and producible observable result \(o\), some program behaves
+like \(P\) everywhere except at \(\sigma_0\), where it produces \(o\). Any
+language that can test its input against a constant has this property,
+including essentially every general-purpose language in use today.
+
+\begin{proposition}[Legal Set Expands Exactly on Observable Slack]
+\label{prop:expansion}
+Assume local patching, and that each \(\mathit{Post}_\theta\) with
+\(\theta \in \mathcal{I}\) is realized by some program. Let
+\(P \models \Phi_{\text{func}}\). Then
+\(\mathrm{Sat}(\Phi_{\text{func}})\) contains a program that is not
+observationally equivalent to \(P\) iff the contract has input, output, or
+logical-parameter slack, counting only results some program produces.
+Unexposed slack is not in that list: it need not change those results.
+\end{proposition}
+
+\noindent\emph{Proof sketch.} If the contract accepts a result on some input
+that differs from \(P\)'s, patching produces a legal program outside
+\([P]_\approx\). Without slack, every covered input has one acceptable result,
+the same for every allowed parameter, and every input is covered, so every
+legal program matches \(P\). (Appendix~\ref{app:proofs}.)
+
+When the contract has no input, output, or logical-parameter slack, intent
+compilation is conventional compilation: the approach generalizes the as-if
+rule rather than replacing it. Unexposed slack can still change cost and
+memory. The proposition does not say that any extra legal program is faster.
+
+\subsection{The Ideal Objective}
+\label{sec:ideal_obj}
+
+Let \(\mathcal{L}_{\text{Target}}\) be an unmodified production compiler for
+the target. It implements the as-if rule: idealized, it searches
+\([P]_\approx\). Let \(\mathcal{O}(\mathrm{Bin}, \text{Target})\) rank
+binaries by cost on that target. A conventional compiler, idealized,
+returns a cheapest binary in the as-if class of \(P_1\):
+\begin{equation}
+\label{eq:traditional}
+\mathrm{Bin}^*_{\text{trad}} \in
+\arg\min_{\mathrm{Bin} \in \{\mathcal{L}_{\text{Target}}(P') \mid
+P' \in [P_1]_\approx\}}
+\mathcal{O}(\mathrm{Bin}, \text{Target}).
+\end{equation}
+An intent compiler wants the same ranking over every binary that
+satisfies the contract:
+\begin{equation}
+\label{eq:intent_pure}
+\mathrm{Bin}^*_{\text{intent}} \in
+\arg\min_{\mathrm{Bin} \models \Phi_{\text{func}}}
+\mathcal{O}(\mathrm{Bin}, \text{Target}).
+\end{equation}
+No compiler searches either set as a whole. Conventional compilation
+applies heuristic rewrites inside \([P_1]_\approx\), the passes of
+\(\mathcal{L}_{\text{Target}}\), and may never reach
+\(\mathrm{Bin}^*_{\text{trad}}\). Intent compilation has the same gap on a
+larger set, and splits~\eqref{eq:intent_pure} into a source step and an
+as-if step:
+\begin{align}
+\label{eq:intent_source}
+P^\star &\in \arg\min_{P' \models \Phi_{\text{func}}}
+\mathcal{O}(\mathcal{L}_{\text{Target}}(P'), \text{Target}), \\
+\label{eq:intent_lower}
+\mathrm{Bin}^*_{\text{intent}} &\in
+\arg\min_{\mathrm{Bin} \in \{\mathcal{L}_{\text{Target}}(P'') \mid
+P'' \in [P^\star]_\approx\}}
+\mathcal{O}(\mathrm{Bin}, \text{Target}).
+\end{align}
+The first level rewrites the source toward a cheaper program in
+\(\mathrm{Sat}(\Phi_{\text{func}})\), and the second is~\eqref{eq:traditional}
+with \(P^\star\) in place of \(P_1\). That composition does not guarantee a
+minimum of~\eqref{eq:intent_pure}, but when \(P_1\) satisfies the contract it
+is never worse than as-if compilation of \(P_1\), because the first level
+searches a set that contains every as-if variant of \(P_1\). It separates
+program-to-program editing under the contract from semantic lowering of a
+single source, and the second level still yields a contract-satisfying
+binary from a contract-satisfying source.
+
+\begin{proposition}[As-If Programs Remain Legal]
+\label{prop:refine}
+If \(P \models \Phi_{\text{func}}\), \(P' \approx P\), and
+\(\theta_{P'} = \theta_P\), then \(P' \models \Phi_{\text{func}}\).
+\end{proposition}
+
+\noindent\emph{Proof sketch.} A violation by \(P'\) would be a bad parameter
+or a bad observable result on some admissible input. The parameters match, so
+the first case is impossible. Observational equivalence transfers the second
+case to \(P\), contradicting \(P \models \Phi_{\text{func}}\).
+(Appendix~\ref{app:proofs}.)
+
+The side condition \(\theta_{P'} = \theta_P\) is required because
+\(\mathit{Post}\) is indexed by \(\theta\). Hence the second level
+preserves the contract: if \(P^\star \models \Phi_{\text{func}}\), every
+program in \([P^\star]_\approx\) with the same \(\theta\) does too.
+
+\subsection{Optimization Contracts}
+\label{sec:opt_contract}
+
+The source step~\eqref{eq:intent_source} and the as-if
+step~\eqref{eq:intent_lower} are not ranked by the same objective, even
+though both displays used \(\mathcal{O}\). The as-if step is
+\(\mathcal{L}_{\text{Target}}\)'s search inside \([P^\star]_\approx\).
+The source step compares programs that need not be observationally
+equivalent, which that backend does not rank. A ranking
+for~\eqref{eq:intent_source} has to be supplied as part of the intent.
+
+That ranking searches a larger set than \([P_1]_\approx\). A rewrite in
+that set can use more resources than \(P_1\), exceeding what the developer
+allocated for the program, for instance a larger memory footprint. Those
+allocations are implicit in \(P_1\), so as-if cannot raise them and
+\(\mathrm{Sat}(\Phi_{\text{func}})\) does not inherit them. Therefore, an
+operational budget \(\mathcal{B}\) is also needed, stating which
+implementations are valid to search: those whose resource use stays within
+what the developer is willing to allocate to the program.
+
+\begin{definition}[Legality and Feasibility]
+\label{def:legal}
+A program \(P\) is \emph{legal} iff \(P \models \Phi_{\text{func}}\), and
+\emph{feasible} iff \(P \models \mathcal{B}\).
+\end{definition}
+
+Search is over programs that are legal and feasible.
+\(\mathcal{B}\) and \(\mathcal{O}\) stay outside \(\Phi_{\text{func}}\)
+because legality, feasibility, and ranking are different jobs.
+\(\Phi_{\text{func}}\) states which programs are legal, \(\mathcal{B}\)
+which of those are feasible, and \(\mathcal{O}\) ranks them. That ranking
+is supplied as part of the intent. It may be computed from the program
+text or measured on a profiled run. \textsc{IntC} uses wall-clock time on
+a named driver. Cyclomatic complexity occupies the same slot
+(\S\ref{sec:related}). A missed latency target is then suboptimal rather
+than illegal, and folding the target into the functional contract would
+reject a legal baseline. Budgets describe the machine and change with the
+deployment, while \(\Phi_{\text{func}}\) does not.
+One functional contract can then yield a 1024-slot ring on a server and a
+1000-slot ring under a tight memory budget. A check of \(\mathcal{B}\) on source
+approximates a constraint on the compiled binary: padding, alignment, and
+allocator overhead are decided later.
+
+Adding \(\mathcal{B}\) as a constraint on the source
+step~\eqref{eq:intent_source} gives
+\begin{equation}
+\label{eq:intent}
+P^\star \in \arg\min_{\substack{P' \models \Phi_{\text{func}} \\ P' \models \mathcal{B}}}
+\mathcal{O}(\mathcal{L}_{\text{Target}}(P'), \text{Target}),
+\qquad
+\mathrm{Bin}^*_{\text{intent}} = \mathcal{L}_{\text{Target}}(P^\star),
+\end{equation}
+where the second equality is~\eqref{eq:intent_lower} once
+\(\mathcal{L}_{\text{Target}}\) has searched \([P^\star]_\approx\), and
+Section~\ref{sec:compiler} searches a generated subset of that source set.
+
+\begin{definition}[Intent Specification]
+\label{def:intent_spec}
+An intent specification is a triple
+\[
+\Phi = \langle \Phi_{\text{func}}, \mathcal{B}, \mathcal{O} \rangle
+\]
+where \(\Phi_{\text{func}}\) is a functional intent contract
+(Definition~\ref{def:contract}), \(\mathcal{B}\) is a conjunction of
+operational constraints on a candidate (static memory, a ban on dynamic
+allocation, alignment), and \(\mathcal{O}\) is a cost ranking of binaries on
+a target.
+\end{definition}
+
+If \(P_1\) already satisfies the contract and the budget, the minimum
+in~\eqref{eq:intent} is never worse than the one in~\eqref{eq:traditional}
+among programs that keep \(\theta_{P_1}\), by Proposition~\ref{prop:refine}.

@@ -1,0 +1,23 @@
+\begin{center}
+\scriptsize
+\begin{tabular}{llllll}
+\toprule
+Case & Rewrite & $K$ & $V$ on $P_1$ & $V$ on winner & As-if \\
+\midrule
+DPDK ring & pow2-mask & 4 & unknown/120.0s & proved/2.0s & not as-if \\
+DPDK pad & pow2-mask & 4 & unknown/120.0s & proved/0.6s & unexposed \\
+ClickHouse & pow2-mask & 4 & unknown/180.2s & proved/63.7s & not as-if \\
+Zephyr & pow2-shift & 1 & proved/0.5s & proved/0.7s & not as-if \\
+gain & pow2-mul & 1 & proved/0.1s & proved/0.1s & not as-if \\
+PARSEC & aos-to-soa & 6 & proved/0.6s & proved/0.6s & layout \\
+Flecs & predicated-update & 10 & proved/0.1s & proved/0.1s & layout \\
+MachSuite & halo-1d & 8 & proved/0.1s & proved/0.1s & layout \\
+CMSIS-DSP & align-loop-bound:BLOCK & 12 & proved/3.3s & proved/7.0s & not as-if \\
+OGRE & narrow-int-field & 6 & proved/0.1s & proved/0.1s & layout \\
+Box2D & squared-compare & 1 & proved/13.7s & proved/0.2s & not as-if \\
+Opus & narrow-accum & 6 & proved/0.7s & proved/12.0s & not as-if \\
+OpenCV & luma-q15 & 6 & unknown/60.0s & proved/0.1s & not as-if \\
+PARSEC fat & aos-to-soa & 6 & proved/0.6s & proved/0.7s & layout \\
+\bottomrule
+\end{tabular}
+\end{center}

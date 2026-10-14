@@ -1,0 +1,12 @@
+name: flecs-sparse-pool-ci
+baseline: baseline.c
+parameters:
+  - name: CAP
+    bits: 32
+    constraints: ["CAP >= 8", "CAP <= 8"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 10
+budget: {}
+verify_timeout_s: 60

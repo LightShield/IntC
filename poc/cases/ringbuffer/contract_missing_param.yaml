@@ -1,0 +1,16 @@
+name: ringbuffer-missing-parameter
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+  - name: NOT_IN_SOURCE
+    bits: 64
+    constraints: ["NOT_IN_SOURCE >= 1"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+budget: {}
+verify_timeout_s: 30

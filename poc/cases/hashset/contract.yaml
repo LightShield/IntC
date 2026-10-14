@@ -1,0 +1,24 @@
+# Open-addressing set — ClickHouse-style hash % buckets
+#
+# Why this I/Post: the table must hold a working set that a prime 10007 was
+# sized for (load-factor headroom). Membership of successfully inserted keys
+# is the observable. Insert may fail at the probe limit. The prime itself is
+# not Post; NBUCKETS >= 10007 is.
+name: hashset-open-addressing
+baseline: baseline.c
+parameters:
+  - name: NBUCKETS
+    bits: 64
+    constraints: ["NBUCKETS >= 10007", "NBUCKETS <= 1048576"]
+harnesses:
+  - file: harness_set.c
+    entry: harness
+    unwind: 6
+    defines: {K: "4"}
+    note: set semantics for every sequence of up to K operations from an empty table
+budget: {}
+objective:
+  metric: ns_per_op
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 300

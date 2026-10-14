@@ -1,0 +1,12 @@
+name: float-inner-product-ci
+baseline: baseline.c
+parameters:
+  - name: LEN
+    bits: 32
+    constraints: ["LEN >= 4", "LEN <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+budget: {}
+verify_timeout_s: 60

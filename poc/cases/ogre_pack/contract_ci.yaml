@@ -1,0 +1,12 @@
+name: ogre-transform-space-ci
+baseline: baseline.c
+parameters:
+  - name: N
+    bits: 32
+    constraints: ["N >= 4", "N <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+budget: {}
+verify_timeout_s: 60

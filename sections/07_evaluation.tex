@@ -1,0 +1,298 @@
+\section{Evaluation}
+\label{sec:evaluation}
+
+This section asks three questions of \textsc{IntC}, in the order of the
+subsections that answer them.
+\begin{enumerate}
+  \item Does \textsc{IntC} work on code extracted from real-world
+  projects?
+  \item Do as-if compilation of \(P_1\), and the oracle, budget filter, and
+  \textsc{TheoryLower} score inside \textsc{IntentCompile}, behave as
+  claimed?
+  \item Under the same lowering backend that compiled \(P_1\), does
+  \textsc{IntC} emit a candidate that is cheaper on
+  \(\mathcal{O}\) than \(P_1\), or the same program?
+\end{enumerate}
+A last subsection names misses of \textsc{IntC}.
+Runs use the machine and compilers of
+Section~\ref{sec:implementation}. Tables are emitted by
+\texttt{python reproduce.py} in the artifact
+(\S\ref{sec:data-availability}). Solver times vary across runs. The
+admit, timeout, and counterexample outcomes, and the rewrite names, are the
+claims.
+
+\subsection{Extracts from Real-World Projects}
+\label{sec:catalog_table}
+
+Each row of Table~\ref{tab:catalog} is one run of \textsc{IntC}
+on a contract that states slack a developer could grant. How each extract
+was cut from the upstream tree is in the artifact.
+
+\begin{table}
+\caption{One \textsc{IntC} run per row. Columns are the extract,
+the catalog rule that fired, the harness bound \(K\), CBMC on \(P_1\) and
+on the admitted program, and how that program compares to \(P_1\).}
+\label{tab:catalog}
+\input{experiments/eval/catalog.tex}
+\end{table}
+
+\textbf{Case.} The cell names a tagged upstream situation whose hot loop we
+extracted, except gain, which is a multiply-to-shift written for this
+catalog. The DPDK ring and pad baselines are the 1000-slot sketches of
+Section~\ref{sec:overview_intent}, not the library sources. ClickHouse's
+baseline uses 10007 buckets, a prime, not the upstream power of two.
+PARSEC and PARSEC fat are the same Euler step on four particles, the
+latter on a 64-byte record that includes four explicit pad fields.
+CMSIS-DSP is a two-tap FIR.
+
+\textbf{Rewrite.} The cell is the catalog rule that produced the admitted
+program. \textsc{TheoryLower} contributes remainder-to-mask, division-to-shift,
+and multiply-to-shift. \textsc{GeneratePool} contributes the representation
+rewrites and Rec.~601. In table order:
+\label{sec:gold_rewrites}
+\begin{itemize}
+  \item DPDK ring: remainder-to-mask. CEGIS selects 1024.
+  \textsc{GeneratePool} also admits pad-and-mask into that pool at \(K=4\).
+  \item DPDK pad: remainder-to-mask on \texttt{STORAGE}, with
+  \texttt{CAPACITY} still 1000. Fullness uses
+  \(\texttt{tail}-\texttt{head}\) against \texttt{CAPACITY}, so enqueue
+  fails at 1000 live packets. The extra 24 cells are a budget cost.
+  \textsc{TheoryLower} and CEGIS produce that mask on the already-named
+  \texttt{STORAGE}.
+  \label{sec:unexposed_eval}
+  \item ClickHouse: remainder-to-mask. \(\mathcal{I}\) requires at least
+  10007 buckets. CEGIS selects 16384, the admissible power of two nearest
+  that floor.
+  \item Zephyr: \(\texttt{tick\_us / DIVISOR}\) to a shift. Relative error
+  at most \(2.5\%\) versus \(\texttt{tick}/1000\) on 32-bit ticks at least
+  640000, because integer division by 1024 overshoots that bound near
+  600000. That floor is part of \(\mathit{Pre}\). CEGIS selects
+  \(\texttt{DIVISOR}\) 1024 and \(\texttt{SHIFT}\) 10.
+  \label{sec:decimation_eval}
+  \item Gain: \(\texttt{sample * GAIN}\) with \(\texttt{GAIN} \in [8,16]\)
+  to a left shift by 3. The harness asserts equality with
+  \(\texttt{sample * GAIN}\) on 16-bit samples, so the admit is not a
+  multiply by the baseline's 10.
+  \label{sec:scale_eval}
+  \item PARSEC: array-of-structs to structure-of-arrays.
+  \label{sec:soa_eval}
+  \item Flecs: predicated update on a 0/1 live flag.
+  \item MachSuite: 1-D halo pad.
+  \item CMSIS-DSP: loop bound aligned to a multiple of 4.
+  \(\mathcal{I}\) is \(\texttt{BLOCK} \ge 5\) with search box
+  \(\texttt{BLOCK} \le 64\); CEGIS selects 8.
+  \item OGRE: 32-bit space tag narrowed to \texttt{uint8\_t}.
+  \item Box2D: \(\texttt{sqrtf(d2) < R}\) to \(\texttt{d2 < R*R}\).
+  \(\mathit{Post}\) is the integer disk test \(dx^2+dy^2 < R^2\); the
+  \(\texttt{sqrtf}\) in \(P_1\) is not that test. The timed bench is
+  \(10^6\) float pairs, outside \(\models_K\).
+  \item Opus: \(\texttt{double}\) accumulator narrowed to \texttt{float}.
+  The harness uses \(\mathit{LEN}=4\) operands in \(\{0,1,2,3\}\). The
+  timed bench is \(L=256\) fractional floats, outside \(\models_K\).
+  \item OpenCV: Rec.~601 float coefficients to a Q15 shift. The harness
+  is that Q15 formula within one gray level, not the float Rec.~601 sum.
+  \(\mathit{NPX}=4\) in the harness; the timed bench is \(1920\times 1080\),
+  outside \(\models_K\).
+  \item PARSEC fat: array-of-structs to structure-of-arrays.
+\end{itemize}
+
+{\bfseries\boldmath\(K\).} The cell is the harness bound for \(\models_K\): how many
+operations or loop unwindings CBMC covers on that row
+(\S\ref{sec:verifier}). Ring, pad, and ClickHouse use four operations from
+an empty container. Zephyr, gain, and Box2D use one conversion, sample, or
+compare. The rest are loop unwindings of the extract: 6 on PARSEC's four particles
+and on OGRE, Opus, OpenCV, and PARSEC fat; 8 on MachSuite; 10 on Flecs;
+12 on the two-tap FIR.
+
+{\bfseries\boldmath\(V\) on \(P_1\) and on the winner.} Those cells are that CBMC
+query. \(\mathsf{unknown}\) is a timeout. PARSEC and PARSEC fat prove the
+Euler step at \(n=4\). CMSIS-DSP proves the two-tap filter. When both
+programs prove, a longer time on the rewrite is the cost of that query.
+Table~\ref{tab:catalog}'s Opus and CMSIS-DSP rows are the two where both
+prove and the rewrite is the slower query.
+
+\textbf{As-if.} The cell classifies the admitted program against \(P_1\).
+\emph{not as-if} means a named parameter or a precision choice moved.
+\emph{unexposed} means the backing store grew and caller-facing capacity
+did not. \emph{layout} means a representation rewrite the harness treats as
+unobservable.
+
+\subsection{Behavior as Claimed}
+\label{sec:microbench}
+
+This subsection answers as-if compilation of \(P_1\), then the oracle, the
+budget filter, and the \textsc{TheoryLower} score, in that order.
+
+\textbf{As-if compilation of \(P_1\).}
+The DPDK ring maps a sequence number \(i\) to a slot by remainder, and in
+\(P_1\) that remainder is \(i \bmod 1000\). MSVC~\texttt{/O2} still emits a
+reciprocal multiply for \texttt{i \% 1000} and \texttt{and ecx, 1023} for
+\texttt{i \% 1024}, and it does not change 1000 to 1024. A microbenchmark of
+that slot expression alone uses 15 interleaved trials of
+\(2\cdot 10^8\) iterations and two seeds. A latency-bound chain measures
+2.67\,ns versus 0.39\,ns, a factor of 6.8, and independent operations
+measure 0.52\,ns versus 0.17\,ns, a factor of 3.1. That upper bound has no
+queue memory traffic.
+
+\label{sec:ablations}
+Table~\ref{tab:ablations} is one switch at a time on that ring's contract
+for the oracle and the budget.
+
+\begin{table}
+\caption{Four switches on the DPDK ring: FIFO oracle, \(\models_K\),
+occupancy-only \(\mathit{Post}\), and an 8016-byte ceiling.}
+\label{tab:ablations}
+\input{experiments/eval/ablations.tex}
+\end{table}
+
+\textbf{Oracle.} The FIFO harness proves the admitted mask in 0.6\,s.
+Admission is \(\models_K\): the colliding mask \(\texttt{\& 999}\) is
+proved at \(K=4\) and refuted at \(K=10\), because slots collide once nine
+or more elements are live.
+\label{sec:bounded_gap}
+An occupancy-only \(\mathit{Post}\) proves a LIFO stack that the FIFO
+harness refutes.
+
+\textbf{Budget filter.}
+\label{sec:budget_eval}
+\textsc{BudgetNormalize} at 8016 bytes, the 1000-slot baseline: CEGIS still
+proves the 1024-slot mask at 8208 bytes. Algorithm~\ref{alg:budgetnormalize}
+drops it and the emit is \(P_1\). The 1000-slot remainder still times out
+at that \(K\).
+
+\textbf{\textsc{TheoryLower} score.}
+\label{sec:score_eval}
+Forty remainder-site variants, on a ring at \(K=4\) and a hash set at
+\(K=3\), have Spearman's \(\rho = 0.11\) between that score
+(\S\ref{sec:implementation}) and CBMC time at a 120\,s timeout.
+Every timeout still has a non-power-of-two remainder in the program, and
+proved times are flat, so a score at or below the threshold is not a
+decision that \(V\) will finish. A score that predicted CBMC time is a
+different score (\S\ref{sec:discussion}). When TheoryLower finds no
+remainder or division hole, it plants no seed: PARSEC's Euler step is that
+case, and \textsc{GeneratePool} still admits structure-of-arrays from
+\(P_1\).
+
+\subsection{Cheaper on \(\mathcal{O}\), or \(P_1\)}
+\label{sec:ring_eval}
+
+This subsection answers whether ranking under the same lowering backend
+emits a candidate cheaper on \(\mathcal{O}\) than \(P_1\), or \(P_1\).
+Table~\ref{tab:timed} is the seven contracts that name a \texttt{bench.c}.
+Min, max, and quartiles are in the artifact JSON.
+
+\begin{table}
+\caption{Contracts that name a \texttt{bench.c}, ordered by emit ratio,
+\(P_1\) last. Columns are the extract, \(K\) on the timed harness, CBMC on
+the admitted program, median wall-clock ns per unit of work of \(P_1\) and
+of the admit under MSVC~\texttt{/O2}, and emit.}
+\label{tab:timed}
+\input{experiments/eval/workhorse.tex}
+\end{table}
+
+\textbf{Case.} The cell is the Table~\ref{tab:catalog} extract whose timed
+contract names that driver.
+
+{\bfseries\boldmath\(K\).} The cell is the timed harness bound. Six of the
+seven match Table~\ref{tab:catalog}. The DPDK ring is \(K=10\) here and
+\(K=4\) in that table. Table~\ref{tab:catalog} used four operations from
+an empty queue. This row uses ten, the bound that refutes
+\texttt{\& 999} in Section~\ref{sec:bounded_gap}.
+
+{\bfseries\boldmath\(V\) on admitted.} The cell is CBMC of the admitted
+rewrite on that timed harness, including CMSIS-DSP where emit is \(P_1\)
+and the cell is still the slower \(\texttt{BLOCK}=8\) admit. The ring row
+is that query at \(K=10\). Table~\ref{tab:catalog}'s ring cell is the same
+rewrite at \(K=4\). Solver seconds move across runs; the proved/unknown
+outcome is the claim.
+
+{\bfseries\boldmath\(P_1\) ns and admitted ns.} Those two cells are
+\(\mathcal{O}\): wall-clock nanoseconds per unit of work on that
+\texttt{bench.c} (pair, update, lookup, enqueue, mac, pixel, or FIR
+block), lower is better. The stage compiles both programs with
+MSVC~\texttt{/O2} and takes the median of 31 trials after warmup. A later
+candidate replaces the current best only if it is faster by more than its
+sample standard deviation.
+
+\textbf{Emit.} The cell is the ratio of those medians, or \(P_1\) when the
+admit is not faster by more than its sample standard deviation.
+In table order:
+\begin{itemize}
+  \item Box2D: in-range pairs. MSVC~\texttt{/O2} still emits
+  \(\texttt{sqrtss}\) from the baseline, so the squared compare is the
+  ranking win. The listing is in the artifact.
+  \item PARSEC fat: the Euler step at \(N=100000\). The catalog query
+  still proves \(n=4\).
+  \item ClickHouse: fill 4000 keys, then \texttt{contains}. The ratio
+  mixes a larger table and a lower load factor with the mask.
+  \label{sec:hash_eval}
+  \item DPDK ring: a dependent enqueue/dequeue chain through a partly
+  full queue. The two programs disagree on the 1001st consecutive
+  enqueue. The isolated slot chain of
+  Section~\ref{sec:microbench} overstates that whole-queue gain. The
+  baseline remainder times out at 300\,s for \(K=4,6,8\) in the recorded
+  sweep, and at 120\,s in Table~\ref{tab:catalog}.
+  \item Opus: the inner-product kernel.
+  \item OpenCV: luma pixels.
+  \item CMSIS-DSP: one \(\texttt{filter()}\) call. Extra trips from
+  rounding 5 to 8 are slower, so this row emits \(P_1\).
+  Table~\ref{tab:catalog} used a contract with no \texttt{bench.c}, so
+  that row emitted the admitted \(\texttt{BLOCK}=8\) rewrite without a
+  timing comparison (\S\ref{sec:implementation}).
+\end{itemize}
+
+\subsection{Misses of This Instance}
+\label{sec:failures}
+
+This subsection names where the three answers fail on \textsc{IntC}.
+Table~\ref{tab:failures} is those misses.
+
+\begin{table}
+\caption{Misses of \textsc{IntC}: never generated, budget, slower
+admit, weak harness, bound too small, driver, and unnamed cost.}
+\label{tab:failures}
+\begin{center}
+\scriptsize
+\begin{tabular}{llp{0.42\columnwidth}}
+\toprule
+Kind & Instance & What happens \\
+\midrule
+Never generated & linked queue, CRS-to-ELLPACK, swap-and-pop & not in the catalog \\
+Budget & 1024-slot mask over 8016\,B & dropped, emit \(P_1\) \\
+Slower admit & FIR \(\texttt{BLOCK}\) 5\(\to\)8 & extra trips, emit \(P_1\) \\
+Weak harness & occupancy-only LIFO & FIFO harness refutes it \\
+Bound too small & \(\texttt{\& 999}\) & proved at \(K=4\), refuted at \(K=10\) \\
+Driver & slot chain vs ring \texttt{bench.c} & \(6.8\times\) vs \(2.3\times\), same rewrite \\
+Unnamed cost & false sharing & not measured \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\textbf{Kind.} The cell is how the miss happens.
+
+\textbf{Instance.} The cell is the extract or rewrite.
+
+\textbf{What happens.} The cell is the outcome. In table order:
+\begin{itemize}
+  \item Never generated: a linked queue, a CRS-to-ELLPACK layout, and a
+  swap-and-pop compaction are not catalog sites, so they never become
+  candidates. A CRS-to-ELLPACK rewrite that kept the stored values would
+  still stream the extra zeros ELLPACK pads.
+  \item Budget: the 1024-slot mask proves and is 8208 bytes. The 8016-byte
+  ceiling drops it and the emit is \(P_1\)
+  (Section~\ref{sec:budget_eval}).
+  \item Slower admit: FIR \(\texttt{BLOCK}\) 8 does extra trips on one
+  \(\texttt{filter()}\) call, so ranking emits \(P_1\)
+  (Section~\ref{sec:ring_eval}).
+  \item Weak harness: an occupancy-only \(\mathit{Post}\) proves a LIFO
+  stack that the FIFO harness refutes
+  (Section~\ref{sec:microbench}).
+  \item Bound too small: \(\texttt{\& 999}\) proves at \(K=4\) and is
+  refuted at \(K=10\) (Section~\ref{sec:bounded_gap}).
+  \item Driver: the isolated slot chain is \(6.8\times\). The ring
+  \texttt{bench.c} is \(2.3\times\) on the same rewrite
+  (Section~\ref{sec:microbench}).
+  \item Unnamed cost: concurrent false sharing is not in any named
+  driver, so it cannot reject a candidate.
+\end{itemize}

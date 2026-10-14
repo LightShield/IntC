@@ -1,0 +1,93 @@
+\section{The \textsc{IntentCompile} Pipeline}
+\label{sec:pipeline}
+
+\textsc{IntentCompile} takes a baseline \(P_1\), a specification
+\(\Phi = \langle \Phi_{\text{func}}, \mathcal{B}, \mathcal{O} \rangle\), and a target. It
+builds \(\mathcal{A}\) and then applies~\eqref{eq:winner}.
+Appendix~\ref{app:algorithms} gives each stage as an algorithm.
+
+\begin{enumerate}
+  \item \textbf{\textsc{CheckRealiz}} (Algorithm~\ref{alg:checkrealiz}) checks that \(\mathcal{I}\) is
+  satisfiable, and reports an unsatisfiable core on conflict. The stage is
+  one solver call and returns when that call does. A timeout is
+  \(\mathsf{unknown}\) and stops the pipeline. A harness that no program can
+  satisfy is discovered later, when no candidate is proved.
+
+  \item \textbf{\textsc{TheoryLower}} (Algorithm~\ref{alg:theorylower})
+  applies rewrites from \(R\) that strictly decrease a nonnegative integer
+  score on program structure. The score is a weighted count of constructs
+  that make the query expensive for \(V\), so descent aims at a sketch the
+  checker can decide, and the loop terminates because each rewrite drops
+the score. Crossing the threshold stops that descent. A sketch is still
+handed to CEGIS when a rewrite applied, even if the score remains above
+the threshold. If no rewrite applied, there is no TheoryLower seed and
+\textsc{GeneratePool} still starts from \(P_1\). Outputs are sketches with holes and side
+constraints. \textsc{IntC}'s weights are in
+Section~\ref{sec:implementation}.
+
+  \item \textbf{\textsc{Baseline-Directed CEGIS}} (Algorithm~\ref{alg:cegis}) fills holes. An optimizer
+  proposes valuations in \(\mathcal{I}\) that meet the side constraints and
+  are as close as possible to \(\theta_{P_1}\). Holes not in the baseline
+  are minimized subject to those constraints. \(V\) checks each candidate.
+  A counterexample refutes that valuation, failing inputs are not constraints
+  on later proposals, and an \(\mathsf{unknown}\) result stops the search. A
+  finite attempt cap preserves soundness and may miss a farther satisfying
+  assignment. The loop is enumerative CEGIS on a finite
+  hole domain. The same loop fills TheoryLower sketches and GeneratePool
+sketches. The sketch does not come from the developer, and hole-filling
+distance is to the baseline so filled holes stay near the program the
+developer already
+wrote~\cite{solarlezama2006sketch, dantoni2016qlose}.
+
+  \item \textbf{\textsc{BudgetNormalize}} (Algorithm~\ref{alg:budgetnormalize}) does not generate programs. It
+  applies the provided checker for \(\mathcal{B}\) to the CEGIS seeds
+  and drops those that miss \(\mathcal{B}\). If none remain,
+  \textsc{GeneratePool} still runs from \(P_1\). \(P_1\) is the fallback of
+  winner selection and is not re-verified.
+
+  \item \textbf{\textsc{GeneratePool}} (Algorithm~\ref{alg:generatepool}) adds further proved programs. It
+  starts from \(P_1\), not from TheoryLower's seeds, so it still runs when
+  TheoryLower is stuck or CEGIS returns nothing. It applies a second catalog
+  of representation rewrites, fills them by CEGIS, and keeps those that
+  \(V\) proves and that fit \(\mathcal{B}\).
+
+  \item \textbf{Winner selection} (Algorithm~\ref{alg:winner}) is the ranking by~\eqref{eq:winner}
+  when the contract names a benchmark. Ranking runs only on \(P_1\) and on
+  programs \(V\) proved.
+  When there is no benchmark, the first admitted candidate is emitted
+  (Section~\ref{sec:implementation}). The stage emits the chosen program as
+  source, with the proof bound and the measurements, because an admitted
+  change can disagree with \(P_1\) on an observable result and that
+  disagreement has to be readable as source.
+\end{enumerate}
+
+\begin{theorem}[Properties of Baseline-Directed CEGIS]
+\label{thm:cegis}
+Let \(S[h]\) range over a finite hole domain \(D\), and let \(N\) be the
+attempt cap (\(N = |D|\) if there is no cap).
+\begin{enumerate}
+  \item If CEGIS returns \(S[h]\), then \(V\) proved \(S[h]\).
+  \item If \(V\) returns on each query, CEGIS returns after at most
+  \(\min(N, |D|)\) iterations.
+  \item If some \(h^\circ \in D\) makes \(S[h^\circ]\) satisfy the contract
+  (or \(\models_K\)), \(V\) never answers \(\mathsf{unknown}\), and there is
+  no attempt cap, then CEGIS returns a satisfying assignment closest to
+  \(\theta_{P_1}\).
+\end{enumerate}
+\end{theorem}
+
+\noindent\emph{Proof sketch.}
+Return is only on \(\mathsf{proved}\). \(V\) respects \(t\), each miss
+removes one element of \(D\), and the cap is finite, so the loop returns.
+A satisfying assignment is never excluded, so the first proved valuation is
+a closest one, unless an attempt cap stops first.
+(Appendix~\ref{app:proofs}.)
+
+The bound \(|D|\) is a worst case. Side constraints such as ``is a power of
+two'' shrink it. An attempt cap preserves soundness and may drop part 3.
+
+On the ring buffer, \(\mathcal{I}\) requires capacity at least 1000.
+\textsc{TheoryLower} produces a mask sketch with a power-of-two side
+constraint. CEGIS's closest value is 1024. The verifier sees the masked
+program and the harness. The remainder in \(P_1\) does not appear in the
+query.

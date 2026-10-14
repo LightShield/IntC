@@ -1,0 +1,23 @@
+# Pairwise in-range — Box2D/Chipmunk-style length vs radius
+#
+# Why this I/Post: the observable is whether a pair is inside a disk of
+# radius R >= 1. Equivalent squared compare is slack. RBOUND is a BMC
+# magnitude bound, not a remainder. models_K is integer dx,dy,R.
+# The timed bench is 1e6 float pairs, outside models_K.
+name: pairwise-inrange
+baseline: baseline.c
+parameters:
+  - name: RBOUND
+    bits: 32
+    constraints: ["RBOUND >= 8", "RBOUND <= 80"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 1
+    note: Integer dx, dy, R in [-RBOUND, RBOUND]. Post is the squared test.
+budget: {}
+objective:
+  metric: ns_per_pair
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 60

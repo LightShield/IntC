@@ -1,0 +1,26 @@
+# Packet ring — DPDK / Folly-style slot mapping
+#
+# Why this I/Post: the NIC/path needs at least 1000 slots (headroom above an
+# 800-packet burst). The developer does not need the index to be `i % 1000`
+# specifically. FIFO order and "full at CAPACITY" are the observable contract.
+# A power-of-two capacity (1024) is allowed; extra cells are a budget cost.
+name: ringbuffer-burst-queue
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 12
+    defines: {K: "10"}
+    note: >
+      FIFO order and success/failure semantics for every sequence of up to K
+      operations from an empty queue whose counters start at an arbitrary value.
+budget: {}
+objective:
+  metric: ns_per_op
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 300

@@ -1,0 +1,17 @@
+name: ringbuffer-physical-slack-ci
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1000"]
+  - name: STORAGE
+    bits: 64
+    constraints: ["STORAGE >= CAPACITY", "STORAGE <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+    note: FIFO and fullness at CAPACITY for sequences of length at most 4.
+budget: {}
+verify_timeout_s: 120

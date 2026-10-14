@@ -1,0 +1,13 @@
+name: integer-gain-mul-shift
+baseline: baseline.c
+parameters:
+  - name: GAIN
+    bits: 32
+    constraints: ["GAIN >= 8", "GAIN <= 16"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 1
+    note: Output equals sample * GAIN. Powers of two in [8, 16] are 8 and 16.
+budget: {}
+verify_timeout_s: 60

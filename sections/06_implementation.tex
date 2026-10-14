@@ -1,0 +1,127 @@
+\section{Implementation}
+\label{sec:implementation}
+
+\textsc{IntC} is a Python source-to-source compiler for C. Tree-sitter
+locates spans in the C text, and there is no intermediate representation.
+Z3 solves parameter constraints, CBMC 6.11.0 is \(V\), and MSVC 19.29
+compiles and measures. The cases and the scripts that produce the numbers
+in Section~\ref{sec:evaluation} are available with the paper.
+
+\paragraph{Contracts.}
+Implementation parameters are \texttt{\#define} constants.
+\(\mathcal{I}\) lists constraints over those names, written
+\texttt{CAPACITY >= 1000}.
+\(\mathit{Pre}\) and \(\mathit{Post}\) are harnesses in C. A harness calls
+the program with arbitrary inputs, restricts them with assumptions, and
+asserts observable results~\cite{clarke2004cbmc}. A YAML file records
+\(\mathcal{I}\), \(\mathcal{B}\), \(\mathcal{O}\), and the paths of those
+harnesses, and does not generate the asserts. Unwind bounds and timeouts
+configure \(V\) and are not \(\mathit{Post}\). The harness sees the
+candidate's \(\theta\) through a generated header, which is how
+\(\mathit{Post}_\theta\) depends on \(\theta\). An optional
+compiled-\texttt{sizeof} ceiling and a named benchmark complete
+\(\mathcal{B}\) and \(\mathcal{O}\).
+
+\paragraph{Verifier.}
+CBMC checks each harness together with out-of-bounds accesses, invalid
+pointers, signed overflow, division by zero, and invalid shifts. Loops are
+unrolled with unwinding assertions. A bound that is too small yields
+\(\mathsf{unknown}\), not a proof, including when a later property also
+fails on that truncated path. Arrays use the theory of arrays
+(\texttt{--arrays-uf-always}). Without that encoding, CBMC expands a
+1024-element ring element by element and does not finish within 120 seconds
+even for three operations. Admission is \(\models_K\) for the harness bound
+\(K\).
+
+\paragraph{Stages.}
+The stages are those of Section~\ref{sec:pipeline}. Only
+\textsc{CheckRealiz} stops the pipeline: a failed TheoryLower, an empty
+CEGIS, or an empty budget filter still runs \textsc{GeneratePool} from
+\(P_1\) and then winner selection.
+\begin{enumerate}
+  \item \textbf{\textsc{CheckRealiz}} checks \(\mathcal{I}\) with Z3.
+  Unknown on \(\mathcal{I}\) fails the stage, as does a name in
+  \(\mathcal{I}\) that is not a \texttt{\#define}.
+
+  \item \textbf{\textsc{TheoryLower}}'s score is
+  \(10\cdot n_{\mathrm{rem/div}} + 3\cdot n_{\mathrm{mul}} + 2\cdot n_{\mathrm{loop}} + n_{\mathrm{deref}}\),
+  where the four counts are remainders and divisions that are not powers
+  of two, variable--variable multiplies, loops, and pointer dereferences.
+  Power-of-two remainders and divisions, and multiplies by literals, are
+  omitted. The sum is a nonnegative integer, so a rewrite that drops at
+  least one counted construct terminates. The contract supplies the stop
+threshold, default 2. Crossing it stops that descent. The catalog is three
+rewrites, and those
+  rewrites introduce the holes.
+  \begin{itemize}
+    \item \texttt{e \% N} becomes \texttt{((e) \& (N - 1))} when \(N\) is a
+    parameter, with side constraint \(\mathrm{is\_pow2}(N)\).
+    \item \texttt{e / D} becomes \texttt{((e) >> S)} when \(D\) and \(S\) are
+    parameters, with \(\mathrm{pow2\_pair}(D,S)\).
+    \item \texttt{e * M} becomes a parenthesized left shift of \(e\) by a
+    fresh hole \(S_M\) with \(\mathrm{pow2\_pair}(M,S_M)\).
+  \end{itemize}
+  CEGIS sees a TheoryLower sketch only when one of those applied.
+
+  \item \textbf{Baseline-directed CEGIS} asks Z3's optimizer for the
+  closest unrefuted valuation of baseline parameters, minimizes extra
+  holes subject to the side constraints, then asks CBMC. A counterexample
+  excludes that valuation and is not a constraint on later proposals. A
+  timeout or an undecided harness is \(\mathsf{unknown}\): CEGIS stops
+  and does not add that valuation to the excluded set. The attempt cap is
+  a contract bound whose default is 16.
+
+  \item \textbf{\textsc{BudgetNormalize}} sums compiled \texttt{sizeof} of
+  file-scope objects, drops a candidate that exceeds the ceiling, and
+  treats a missing ceiling as no check.
+
+  \item \textbf{\textsc{GeneratePool}} starts from \(P_1\). Each matching
+  rewrite becomes one sketch \(r(P_1)\), filled by the same CEGIS loop.
+  The catalog is general representation rewrites. It is extended with one
+  domain formula, registered the same way a developer would add a formula
+  from their domain.
+  \begin{itemize}
+    \item Representation:
+    \begin{itemize}
+      \item pad-and-mask (a larger backing array so remainder indexing
+      becomes a mask)
+      \item narrowing a 32-bit space tag to \texttt{uint8\_t}
+      \item array-of-structs to structure-of-arrays
+      \item aligning a loop bound to a multiple of 4
+      \item predicating a sparse \texttt{if (flag[i])} update
+      \item 1D halo pad (ghost cells so a 3-point stencil loop does not
+      branch at the ends)
+      \item replacing \texttt{sqrtf(E)~<~R} by a squared compare
+      \item narrowing a \texttt{double} accumulator to \texttt{float}
+    \end{itemize}
+    \item Domain formula: Rec.~601 float MAC to Q15.
+  \end{itemize}
+
+  \item \textbf{Winner selection} instantiates~\eqref{eq:winner} under
+  \texttt{/O2}. It keeps the lowest median of the contract's benchmark,
+  and replaces \(P_1\) only when a candidate is faster by more than that
+  candidate's sample standard deviation. When the contract has no
+  benchmark, the first admitted candidate is emitted without a timing
+  comparison.
+\end{enumerate}
+
+\paragraph{Scope.}
+\textsc{IntC} is a C instance of \textsc{IntentCompile} on extracts.
+\begin{itemize}
+  \item The contract is \texttt{\#define} parameters, a YAML record of
+  \(\mathcal{I}\), \(\mathcal{B}\), and \(\mathcal{O}\), and CBMC harnesses,
+  with \(V\) bounded CBMC. \textsc{CheckRealiz} decides satisfiability of
+  \(\mathcal{I}\), and the implemented conjunct of \(\mathcal{B}\) is an
+  optional compiled-\texttt{sizeof} ceiling on file-scope objects.
+  Unbounded operation sequences would need an inductive argument.
+  \item The rewrite catalogs are small and can be extended the same way
+  the domain formula is registered. For example, a linked queue or
+  reordering struct fields to cut padding can be added that way. This
+  \textsc{IntC} does not compile general C or C++ programs. For example, C++
+  atomics, application-scale floats, and storage-format rewrites like
+  CRS-to-ELLPACK are outside it.
+  \item Lowering is MSVC~\texttt{/O2} on an Intel Core i7-14700K under
+  Windows, and ranking compares \(P_1\) and the admitted programs under
+  that same pair. That pair is \(\mathcal{O}\) for \textsc{IntC}, and
+  another compiler or machine is another \(\mathcal{O}\).
+\end{itemize}

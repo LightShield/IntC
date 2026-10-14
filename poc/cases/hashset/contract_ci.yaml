@@ -1,0 +1,17 @@
+# Same Post as contract.yaml at K=4. No bench: this is the e2e compile path.
+name: hashset-open-addressing-ci
+baseline: baseline.c
+parameters:
+  - name: NBUCKETS
+    bits: 64
+    constraints: ["NBUCKETS >= 10007", "NBUCKETS <= 1048576"]
+  - name: MAXPROBE
+    bits: 64
+    constraints: ["MAXPROBE >= 4", "MAXPROBE <= 4"]
+harnesses:
+  - file: harness_set.c
+    entry: harness
+    unwind: 6
+    defines: {K: "4"}
+budget: {}
+verify_timeout_s: 180

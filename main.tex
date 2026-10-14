@@ -1,0 +1,67 @@
+\documentclass[acmsmall,screen,nonacm]{acmart}
+
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,keepspaces=true,frame=none,commentstyle=\upshape}
+
+\title{Compiling Against Intent}
+\author{Or Magen}
+\affiliation{\institution{Independent Researcher}\country{USA}}
+
+\begin{abstract}
+Source programs mix invariant requirements with incidental choices, and an
+optimizing compiler bound by the as-if rule must preserve both. The set of
+programs that satisfy the requirements is often larger than the set of as-if
+variants of a correct baseline, so as-if search may omit a cheaper legal
+program. A queue whose requirements are FIFO order and capacity at least 1000
+may be written with 1000 cells and remainder indexing. A 1024-cell ring indexed
+by a mask still satisfies those requirements, and as-if cannot emit that ring
+from the baseline. That set cannot be searched as a whole.
+
+\textsc{IntentCompile} is a restricted compiler that starts from an existing
+baseline and a checkable contract naming those requirements, generates
+candidates, admits those a sound verifier proves, and ranks them by
+measurement. \textsc{IntC} is a C instance: a rewrite catalog, CBMC on bounded
+harnesses, and MSVC \texttt{/O2}. On that baseline, \texttt{/O2} keeps 1000
+cells and remainder indexing, and \textsc{IntC} admits the 1024-cell program
+and selects it at \(2.3\times\) on the named benchmark.
+\end{abstract}
+
+\theoremstyle{acmdefinition}
+\newtheorem{algo}{Algorithm}
+
+\begin{document}
+\maketitle
+
+\input{sections/01_intro}
+\input{sections/02_overview}
+\input{sections/03_ideal}
+\input{sections/04_compiler}
+\input{sections/05_pipeline}
+\input{sections/06_implementation}
+\input{sections/07_evaluation}
+\input{sections/08_related}
+\input{sections/09_discussion}
+
+\section*{Data-Availability Statement}
+\label{sec:data-availability}
+
+An artifact accompanies this paper: \textsc{IntC}, a Python source-to-source
+compiler for C, the contracts and C extracts of
+Section~\ref{sec:evaluation}, CBMC harnesses, and the script that rebuilds
+the catalog, ablation, and timed-contract tables. Admission is
+\(\models_K\) with CBMC 6.11.0. Measurement and listings use
+MSVC 19.29~\texttt{/O2} on Windows. From \texttt{poc/}, after
+\texttt{pip install -e .}, \texttt{python reproduce.py} rebuilds those
+tables. Solver times are not bit-stable. Admit, timeout, and
+counterexample outcomes, and rewrite names, must match
+\texttt{ARTIFACT\_README.md}.
+The artifact is \url{https://github.com/LightShield/IntC}.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix}
+\end{document}

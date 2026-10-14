@@ -1,0 +1,13 @@
+# Same Post as contract.yaml. No bench: e2e compile path.
+name: pairwise-inrange-ci
+baseline: baseline.c
+parameters:
+  - name: RBOUND
+    bits: 32
+    constraints: ["RBOUND >= 8", "RBOUND <= 80"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 1
+budget: {}
+verify_timeout_s: 60

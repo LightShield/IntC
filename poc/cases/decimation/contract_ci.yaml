@@ -1,0 +1,16 @@
+name: tick-to-ms-output-slack-ci
+baseline: baseline.c
+parameters:
+  - name: DIVISOR
+    bits: 64
+    constraints: ["DIVISOR >= 1000"]
+  - name: SHIFT
+    bits: 8
+    constraints: ["SHIFT >= 1", "SHIFT <= 31"]
+harnesses:
+  - file: harness_error.c
+    entry: harness
+    unwind: 1
+    note: same Post as contract.yaml (single-call, cheap CBMC).
+budget: {}
+verify_timeout_s: 120

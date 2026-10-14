@@ -1,0 +1,139 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Compiling against a Specification.}
+Leroy distinguishes compilers that preserve a program's behavior from
+compilers that preserve only a specification, and notes that the latter
+leave more room for optimization~\cite[\S2.1]{leroy2009backend}. Refinement
+calculi make any program that refines a specification a correct
+implementation~\cite{back1998refinement,morgan1994programming}. Fiat
+refines specifications with deliberate freedom into proved implementations
+in Coq~\cite{delaware2015fiat}. Data representation synthesis, Cozy, and
+Primrose choose among the implementations a specification
+admits~\cite{hawkins2011representation,loncaric2016cozy,Qin2023Primrose}.
+
+Those systems compile a specification: Fiat and Cozy in a language built
+for that compilation, Primrose from annotations on Rust into a library
+container. \textsc{IntentCompile} uses a general contract with a
+general-purpose program the developer wrote as the seed of the search.
+The compiler treats that seed as a proxy of the developer's mental model of
+the problem and searches from it for a similar but cheaper solution.
+Section~\ref{sec:ideal} states the problem for a general-purpose language
+of the kind developers already run in production. \textsc{IntC} is the C
+instance this paper evaluates. Table~\ref{tab:related} places that instance
+against specification compilers, schedulers, and as-if-relaxing tools.
+
+\begin{table}
+\caption{Columns are the host language, whether \(\theta\) is a named
+parameter the developer writes, whether the search includes a rewrite
+as-if would reject, the admission oracle, and whether the compiler can
+emit \(P_1\) when the search fails. \textsc{IntentCompile} is the
+algorithm. \textsc{IntC} is the C instance.}
+\label{tab:related}
+\centering
+\scriptsize
+\begin{tabular}{lccccc}
+\toprule
+System & Language & Named \(\theta\) & Non-as-if slack & Sound \(V\) & Fallback \(P_1\) \\
+\midrule
+Fiat~\cite{delaware2015fiat} & Coq & in the spec & yes & Coq & no \\
+Cozy~\cite{loncaric2016cozy} & spec to Java & in the spec & yes & synthesis checker & no \\
+Primrose~\cite{Qin2023Primrose} & annotated Rust & container spec & yes & SMT & library pick \\
+STOKE~\cite{schkufza2014fp} & x86 asm & error bound & numeric & validator & best-so-far \\
+Alive2~\cite{lopes2021alive2} & LLVM IR & no & no & yes & n/a \\
+Halide/Exo~\cite{ragan2013halide,ikarashi2022exo} & own language & schedule & no & lowering & n/a \\
+PetaBricks~\cite{ansel2009petabricks} & own language & autotune knobs & authored menu & no & no \\
+\textsc{IntC} & C & \(\mathcal{I}\) & yes & \(\models_K\) & yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Scheduling Languages.}
+Halide and Exo keep a DSL algorithm, including sizes, fixed and search its
+schedule~\cite{ragan2013halide,ikarashi2022exo}. \textsc{IntentCompile}
+searches structured refactors of a general-purpose program, starting from
+the current implementation and a contract that names which of its choices
+are slack.
+
+\paragraph{Optimizing under Relaxed Correctness.}
+Production compilers already ship named, opt-in relaxations of as-if.
+\texttt{-ffast-math} is one example, a fixed license to reassociate and
+otherwise rewrite IEEE-754 arithmetic, and scoped floating-point pragmas
+are another. STOKE optimizes floating-point code against
+a user-chosen error bound~\cite{schkufza2014fp}. Sound compilation of reals
+and Chisel choose
+any implementation within a stated
+tolerance~\cite{darulova2014sound,misailovic2014chisel}. Conditionally
+correct superoptimization exploits facts about inputs beyond undefined
+behavior~\cite{sharma2015conditionally}. Carbin et al.\ verify acceptability
+properties of relaxed programs~\cite{carbin2012relaxed}. Loop perforation
+trades accuracy for speed under empirical
+checks~\cite{sidiroglou2011managing}. PetaBricks lets the developer write
+several algorithms for one computation and autotunes among them by
+measurement~\cite{ansel2009petabricks}.
+
+They each implement a particular relaxation, an opt-in compiler flag, an
+error bound, extra input facts, perforation, or an authored menu. Because \textsc{IntentCompile}
+does not take as-if as the bound, a contract can name several of those
+freedoms together, and the search is a structured refactor of the current
+implementation.
+
+\paragraph{Translation Validation and Superoptimization.}
+Translation validation~\cite{pnueli1998translation,necula2000translation}
+and CompCert~\cite{leroy2009backend} certify as-if: CompCert proves that the
+backend preserves the source's observable behavior. Alive2 checks that a
+transformation refines its LLVM
+source~\cite{lopes2021alive2, lee2017taming}. Souper synthesizes peephole
+optimizations that the same check
+admits~\cite{sasnauskas2017souper}. Recent systems pair language models
+with these checkers~\cite{taneja2025llmvectorizer,fang2026llmveriopt}.
+Rinard finds that agents under relational equivalence can pick slower
+algorithms because they are easier to prove
+equivalent~\cite{rinard2026quantitative}.
+
+Those checkers ask whether a candidate is equivalent to the source or
+refines it. \textsc{IntentCompile} keeps the same split of untrusted
+proposer and sound checker, and the checker asks whether the candidate
+satisfies the contract, which is what admits a 1024-cell ring from a
+1000-cell baseline.
+
+\paragraph{Lifting and Verification-Friendly Programs.}
+Verified lifting translates code into a higher-level form that can be
+verified and then regenerated~\cite{kamil2016stng,bhatia2024llmlift}, with
+the lifted specification proved equivalent to the source. Wagner et al.\
+compile a separate, verification-friendly build~\cite{wagner2013overify}.
+Instrumentation can make programs easier for automated tools to
+verify~\cite{amilon2023instrumentation}. Ivy restructures protocols into
+decidable fragments by
+hand~\cite{padon2016ivy,padon2017paxosepr}. Predicting solver cost is
+studied for choosing among tools~\cite{healy2017where4,leeson2022graves}.
+
+A specification proved equivalent to the source keeps the legal set inside
+as-if of that source. \textsc{IntentCompile} generates candidates from the
+current implementation and the contract. \textsc{TheoryLower} rewrites
+toward a sketch \(V\) can decide, and \(V\) admits against the contract.
+A measurement of \(\mathcal{O}\) may not need that proof, but the compiler
+still ranks only among admitted programs so a cheaper but illegal candidate
+is not emitted.
+
+\paragraph{Data Layout in Compilers.}
+Production compilers restructure data when they can prove the change
+invisible~\cite{zhao2007forma,hundt2006practical,lattner2005pool}. MEMOIR
+makes collections explicit in IR~\cite{mcmichen2024memoir}. Annotation-based
+AoS-to-SoA conversions are trusted rather than
+checked~\cite{radtke2025annotation}.
+
+Those passes are unexposed slack (\S\ref{sec:slack}): extra cells or a
+different layout the interface does not observe. \textsc{IntentCompile}
+can name that slack and logical-parameter slack, a capacity the caller can
+observe, in one contract, and \(V\) admits the refactor.
+
+\paragraph{Objectives.}
+Objectives that rank programs come in many kinds. Autotuners such as
+PetaBricks rank by measured
+runtime~\cite{ansel2009petabricks}. McCabe's cyclomatic
+complexity~\cite{mccabe1976complexity} and Martin's coupling and
+abstraction~\cite{martin2000design} are computed from the program text.
+\(\mathcal{O}\) in Section~\ref{sec:opt_contract} is that supplied ranking
+over programs the contract admits. \textsc{IntC} fills it with a
+profile-guided measurement, wall-clock time on a named driver.

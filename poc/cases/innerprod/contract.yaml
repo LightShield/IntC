@@ -1,0 +1,23 @@
+# Inner product — Opus SILK-style double accum on float vectors
+#
+# Why this I/Post: for small integer-valued floats the float MAC is an
+# allowed result. Double accumulation is incidental. LEN is the BMC length.
+# models_K is LEN=4 operands in {0,1,2,3}. The timed bench is L=256
+# fractional floats; that split is the K-bounded oracle, not a hidden Pre.
+name: float-inner-product
+baseline: baseline.c
+parameters:
+  - name: LEN
+    bits: 32
+    constraints: ["LEN >= 4", "LEN <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 6
+    note: Four samples in {0,1,2,3}. Post is equality with a float MAC.
+budget: {}
+objective:
+  metric: ns_per_mac
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 60

@@ -1,0 +1,18 @@
+name: ringbuffer-measure-ci
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+    note: FIFO at K=4. Bench is short (bench_ci.c), not the paper workload.
+budget: {}
+objective:
+  metric: ns_per_op
+  bench: bench_ci.c
+  trials: 3
+verify_timeout_s: 120

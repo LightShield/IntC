@@ -1,0 +1,29 @@
+# Tick to milliseconds — Zephyr-style integer decimation
+#
+# Why this I/Post: telemetry epochs are milliseconds. Dividing by 1000 is the
+# nominal conversion. A 2.5% relative error vs that nominal is acceptable on
+# ticks after a short warmup (Pre: tick >= 640000), which is what licenses
+# /1024 as a shift. The floor is stated because truncation near 600000 exceeds
+# 2.5%. The developer is not asking for bitwise identity with /1000.
+# SHIFT <= 31 is a search box (pairs DIVISOR with a C shift). There is no
+# DIVISOR upper bound in I; 1024 is CEGIS's first power of two above 1000.
+name: tick-to-ms-output-slack
+baseline: baseline.c
+parameters:
+  - name: DIVISOR
+    bits: 64
+    constraints: ["DIVISOR >= 1000"]
+  - name: SHIFT
+    bits: 8
+    constraints: ["SHIFT >= 1", "SHIFT <= 31"]
+harnesses:
+  - file: harness_error.c
+    entry: harness
+    unwind: 1
+    note: >
+      Integer conversion of a 32-bit tick in [640000, 2^32-1] stays within
+      2.5% of tick/1000. The 640000 floor is required for integer /1024;
+      real division 1024 vs 1000 is 2.34%, truncation overshoots 2.5% near
+      600000.
+budget: {}
+verify_timeout_s: 120

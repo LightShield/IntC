@@ -1,0 +1,23 @@
+# Sparse entity step — Flecs-style active flag
+#
+# Why this I/Post is something a developer would write:
+# - The game loop must update every *live* entity by dt. Dead slots are don't-cares
+#   except they must not be mutated (so we can reuse them on spawn).
+# - CAP is a pool ceiling, not a live count. We do not require a packed dense
+#   array in Post; packing would change spawn indices. Predication (multiply by
+#   the 0/1 flag) preserves ids and removes the data-dependent branch.
+#
+# Assumptions added for BMC: CAP=8, two spawns, |x|,|d| small, flags are 0/1.
+name: flecs-sparse-pool
+baseline: baseline.c
+parameters:
+  - name: CAP
+    bits: 32
+    constraints: ["CAP >= 8", "CAP <= 8"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 10
+    note: Two live entities updated by d; other slots stay 0.
+budget: {}
+verify_timeout_s: 60

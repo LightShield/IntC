@@ -1,0 +1,23 @@
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+
+# Compiler / Python
+*.obj
+*.exe
+*.pdb
+*.ilk
+__pycache__/
+.pytest_cache/
+*.egg-info/
+poc/tmp/
+poc/.pytest_cache/
+experiments/eval/_work/
+experiments/eval/ceiling/_work/
+experiments/eval/_scout/

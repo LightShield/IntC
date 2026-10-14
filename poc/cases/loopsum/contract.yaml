@@ -1,0 +1,16 @@
+name: loopsum-no-rewrite
+baseline: baseline.c
+parameters:
+  - name: N
+    bits: 64
+    constraints: ["N >= 1", "N <= 64"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 10
+    note: >
+      Post is the sum of a[0..N). N is not a remainder or divisor.
+      TheoryLower is expected to get stuck and emit P1.
+budget: {}
+kappa_threshold: 0
+verify_timeout_s: 30

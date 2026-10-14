@@ -1,0 +1,15 @@
+name: cmsis-fir-block-ci
+baseline: baseline.c
+parameters:
+  - name: BLOCK
+    bits: 32
+    constraints: ["BLOCK >= 5", "BLOCK <= 64"]
+  - name: TAPS
+    bits: 32
+    constraints: ["TAPS >= 2", "TAPS <= 2"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 12
+budget: {}
+verify_timeout_s: 90

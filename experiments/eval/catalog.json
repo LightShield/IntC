@@ -1,0 +1,1258 @@
+{
+  "meta": {
+    "when": "2026-10-13T21:51:33.160622+00:00",
+    "machine": "see paper \u00a77"
+  },
+  "rows": [
+    {
+      "id": "ring",
+      "contract": "cases/ringbuffer/contract_ci.yaml",
+      "K": "4",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=21 ; pow2-mask@406 -> kappa=11 ; pow2-mask@554 -> kappa=1",
+      "pool_n": 2,
+      "pool_applied": [
+        [
+          "pow2-mask@406",
+          "pow2-mask@554"
+        ],
+        [
+          "pad-and-mask"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}",
+          "params": {
+            "CAPACITY": 1024
+          },
+          "applied": [
+            "pow2-mask@406",
+            "pow2-mask@554"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 2.018056899891235,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "pad-and-mask:{'CAPACITY': 1000, 'STORAGE': 1024}",
+          "params": {
+            "CAPACITY": 1000,
+            "STORAGE": 1024
+          },
+          "applied": [
+            "pad-and-mask"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.5495267999358475,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}",
+      "winner_params": {
+        "CAPACITY": 1024
+      },
+      "winner_applied": [
+        "pow2-mask@406",
+        "pow2-mask@554"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 2.018056899891235,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "CAPACITY": 1000
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract ringbuffer-burst-queue-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'CAPACITY': 1000}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=21 ; pow2-mask@406 -> kappa=11 ; pow2-mask@554 -> kappa=1\n  [PASS] S3 Baseline-Directed CEGIS (2.0s): seeds: pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.6s): pool of 2 (performance catalog has 9 rewrites, added pad-and-mask:{'CAPACITY': 1000, 'STORAGE': 1024})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\ring\\out.c\n  log:\n    CEGIS try 1: {'CAPACITY': 1024} -> proved(2.0s)\n    CEGIS try 1: {'CAPACITY': 1000, 'STORAGE': 1024} -> proved(0.5s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.004821700043976307,
+        "S2 TheoryLower": 0.0013919000048190355,
+        "S3 Baseline-Directed CEGIS": 2.0278143999166787,
+        "S4 BudgetNormalize": 2.300017513334751e-06,
+        "S5 GeneratePool": 0.5598638999508694,
+        "S6 WinnerSelection": 2.400018274784088e-06,
+        "S7 Emit": 0.0006600000197067857
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "unknown",
+          "seconds": 120.01486669993028,
+          "reason": "timeout after 120.0s"
+        }
+      ]
+    },
+    {
+      "id": "ring-physical",
+      "contract": "cases/ringbuffer_exact/contract_ci.yaml",
+      "K": "4",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=21 ; pow2-mask@376 -> kappa=11 ; pow2-mask@523 -> kappa=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "pow2-mask@376",
+          "pow2-mask@523"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-mask@376+pow2-mask@523:{'CAPACITY': 1000, 'STORAGE': 1024}",
+          "params": {
+            "CAPACITY": 1000,
+            "STORAGE": 1024
+          },
+          "applied": [
+            "pow2-mask@376",
+            "pow2-mask@523"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.648404199979268,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-mask@376+pow2-mask@523:{'CAPACITY': 1000, 'STORAGE': 1024}",
+      "winner_params": {
+        "CAPACITY": 1000,
+        "STORAGE": 1024
+      },
+      "winner_applied": [
+        "pow2-mask@376",
+        "pow2-mask@523"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.648404199979268,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "CAPACITY": 1000,
+        "STORAGE": 1000
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "unexposed (API capacity fixed)",
+      "pipeline": "contract ringbuffer-physical-slack-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'CAPACITY': 1000, 'STORAGE': 1000}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=21 ; pow2-mask@376 -> kappa=11 ; pow2-mask@523 -> kappa=1\n  [PASS] S3 Baseline-Directed CEGIS (0.7s): seeds: pow2-mask@376+pow2-mask@523:{'CAPACITY': 1000, 'STORAGE': 1024}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.0s): pool of 1 (performance catalog has 9 rewrites, added none)\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate pow2-mask@376+pow2-mask@523:{'CAPACITY': 1000, 'STORAGE': 1024}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\ring-physical\\out.c\n  log:\n    CEGIS try 1: {'CAPACITY': 1000, 'STORAGE': 1024} -> proved(0.6s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0015045999316498637,
+        "S2 TheoryLower": 0.001339400070719421,
+        "S3 Baseline-Directed CEGIS": 0.657347199972719,
+        "S4 BudgetNormalize": 3.700028173625469e-06,
+        "S5 GeneratePool": 0.0009376999223604798,
+        "S6 WinnerSelection": 2.300017513334751e-06,
+        "S7 Emit": 0.0005466999718919396
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "unknown",
+          "seconds": 120.02294269995764,
+          "reason": "timeout after 120.0s"
+        }
+      ]
+    },
+    {
+      "id": "hash",
+      "contract": "cases/hashset/contract_ci.yaml",
+      "K": "4",
+      "S2_ok": true,
+      "S2_details": "stuck; kappa=44 ; pow2-mask@456 -> kappa=34 ; pow2-mask@552 -> kappa=24 ; pow2-mask@816 -> kappa=14 ; pow2-mask@912 -> kappa=4; stuck; remaining cost drivers: loop=2",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "pow2-mask@456",
+          "pow2-mask@552",
+          "pow2-mask@816",
+          "pow2-mask@912"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384, 'MAXPROBE': 4}",
+          "params": {
+            "NBUCKETS": 16384,
+            "MAXPROBE": 4
+          },
+          "applied": [
+            "pow2-mask@456",
+            "pow2-mask@552",
+            "pow2-mask@816",
+            "pow2-mask@912"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 63.713600900024176,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384, 'MAXPROBE': 4}",
+      "winner_params": {
+        "NBUCKETS": 16384,
+        "MAXPROBE": 4
+      },
+      "winner_applied": [
+        "pow2-mask@456",
+        "pow2-mask@552",
+        "pow2-mask@816",
+        "pow2-mask@912"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 63.713600900024176,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "NBUCKETS": 10007,
+        "MAXPROBE": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract hashset-open-addressing-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'NBUCKETS': 10007, 'MAXPROBE': 4}\n  [PASS] S2 TheoryLower (0.0s): stuck; kappa=44 ; pow2-mask@456 -> kappa=34 ; pow2-mask@552 -> kappa=24 ; pow2-mask@816 -> kappa=14 ; pow2-mask@912 -> kappa=4; stuck; remaining cost drivers: loop=2\n  [PASS] S3 Baseline-Directed CEGIS (63.7s): seeds: pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384, 'MAXPROBE': 4}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.0s): pool of 1 (performance catalog has 9 rewrites, added none)\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384, 'MAXPROBE': 4}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\hash\\out.c\n  log:\n    CEGIS try 1: {'NBUCKETS': 16384, 'MAXPROBE': 4} -> proved(63.7s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0015824000583961606,
+        "S2 TheoryLower": 0.00795180001296103,
+        "S3 Baseline-Directed CEGIS": 63.72578569990583,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 0.0022496000165119767,
+        "S6 WinnerSelection": 1.100008375942707e-06,
+        "S7 Emit": 0.000728099956177175
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "unknown",
+          "seconds": 180.15884569997434,
+          "reason": "timeout after 180.0s"
+        }
+      ]
+    },
+    {
+      "id": "decimation",
+      "contract": "cases/decimation/contract_ci.yaml",
+      "K": "unwind 1",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=10 ; pow2-shift@352 -> kappa=0",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "pow2-shift@352"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-shift@352:{'DIVISOR': 1024, 'SHIFT': 10}",
+          "params": {
+            "DIVISOR": 1024,
+            "SHIFT": 10
+          },
+          "applied": [
+            "pow2-shift@352"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.6747569000581279,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-shift@352:{'DIVISOR': 1024, 'SHIFT': 10}",
+      "winner_params": {
+        "DIVISOR": 1024,
+        "SHIFT": 10
+      },
+      "winner_applied": [
+        "pow2-shift@352"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.6747569000581279,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "DIVISOR": 1000,
+        "SHIFT": 0
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract tick-to-ms-output-slack-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'DIVISOR': 1000, 'SHIFT': 0}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=10 ; pow2-shift@352 -> kappa=0\n  [PASS] S3 Baseline-Directed CEGIS (0.7s): seeds: pow2-shift@352:{'DIVISOR': 1024, 'SHIFT': 10}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.0s): pool of 1 (performance catalog has 9 rewrites, added none)\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate pow2-shift@352:{'DIVISOR': 1024, 'SHIFT': 10}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\decimation\\out.c\n  log:\n    CEGIS try 1: {'DIVISOR': 1024, 'SHIFT': 10} -> proved(0.7s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0012489000800997019,
+        "S2 TheoryLower": 0.00024759990628808737,
+        "S3 Baseline-Directed CEGIS": 0.7122613000683486,
+        "S4 BudgetNormalize": 1.100008375942707e-06,
+        "S5 GeneratePool": 0.00032049999572336674,
+        "S6 WinnerSelection": 8.998904377222061e-07,
+        "S7 Emit": 0.0004965000553056598
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.5475167999975383,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "scale",
+      "contract": "cases/scale/contract_ci.yaml",
+      "K": "unwind 1",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=3 ; pow2-mul@251 -> kappa=0",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "pow2-mul@251"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-mul@251:{'GAIN': 8, 'SH_GAIN': 3}",
+          "params": {
+            "GAIN": 8,
+            "SH_GAIN": 3
+          },
+          "applied": [
+            "pow2-mul@251"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.0822895000455901,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-mul@251:{'GAIN': 8, 'SH_GAIN': 3}",
+      "winner_params": {
+        "GAIN": 8,
+        "SH_GAIN": 3
+      },
+      "winner_applied": [
+        "pow2-mul@251"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.0822895000455901,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "GAIN": 10
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract integer-gain-mul-shift-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'GAIN': 10}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=3 ; pow2-mul@251 -> kappa=0\n  [PASS] S3 Baseline-Directed CEGIS (0.1s): seeds: pow2-mul@251:{'GAIN': 8, 'SH_GAIN': 3}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.0s): pool of 1 (performance catalog has 9 rewrites, added none)\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate pow2-mul@251:{'GAIN': 8, 'SH_GAIN': 3}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\scale\\out.c\n  log:\n    CEGIS try 1: {'GAIN': 8, 'SH_GAIN': 3} -> proved(0.1s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0010980999795719981,
+        "S2 TheoryLower": 0.00025129993446171284,
+        "S3 Baseline-Directed CEGIS": 0.08896960003767163,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 0.00028609996661543846,
+        "S6 WinnerSelection": 1.200009137392044e-06,
+        "S7 Emit": 0.0005377000197768211
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.08441570005379617,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "particles",
+      "contract": "cases/particles/contract_ci.yaml",
+      "K": "unwind 6",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=8; stuck; remaining cost drivers: mul_nonconst=2, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "aos-to-soa"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "aos-to-soa:{'N': 4}",
+          "params": {
+            "N": 4
+          },
+          "applied": [
+            "aos-to-soa"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.6145162000320852,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "aos-to-soa:{'N': 4}",
+      "winner_params": {
+        "N": 4
+      },
+      "winner_applied": [
+        "aos-to-soa"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.6145162000320852,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "N": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "representation",
+      "pipeline": "contract particle-aos-kinematics-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'N': 4}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=8; stuck; remaining cost drivers: mul_nonconst=2, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.6s): pool of 1 (performance catalog has 9 rewrites, added aos-to-soa:{'N': 4})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate aos-to-soa:{'N': 4}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\particles\\out.c\n  log:\n    CEGIS try 1: {'N': 4} -> proved(0.6s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.001365999924018979,
+        "S2 TheoryLower": 0.0012326000723987818,
+        "S3 Baseline-Directed CEGIS": 7.00005330145359e-07,
+        "S4 BudgetNormalize": 9.00006853044033e-07,
+        "S5 GeneratePool": 0.6195877999998629,
+        "S6 WinnerSelection": 1.200009137392044e-06,
+        "S7 Emit": 0.0005706000374630094
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.6197240999899805,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "flecs",
+      "contract": "cases/flecs_pool/contract_ci.yaml",
+      "K": "unwind 10",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=6; stuck; remaining cost drivers: loop=3",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "predicated-update"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "predicated-update:{'CAP': 8}",
+          "params": {
+            "CAP": 8
+          },
+          "applied": [
+            "predicated-update"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.09164180001243949,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "predicated-update:{'CAP': 8}",
+      "winner_params": {
+        "CAP": 8
+      },
+      "winner_applied": [
+        "predicated-update"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.09164180001243949,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "CAP": 8
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "representation",
+      "pipeline": "contract flecs-sparse-pool-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'CAP': 8}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=6; stuck; remaining cost drivers: loop=3\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.1s): pool of 1 (performance catalog has 9 rewrites, added predicated-update:{'CAP': 8})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate predicated-update:{'CAP': 8}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\flecs\\out.c\n  log:\n    CEGIS try 1: {'CAP': 8} -> proved(0.1s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0011347999097779393,
+        "S2 TheoryLower": 0.0011706000659614801,
+        "S3 Baseline-Directed CEGIS": 7.00005330145359e-07,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 0.09619229997042567,
+        "S6 WinnerSelection": 1.200009137392044e-06,
+        "S7 Emit": 0.0005295999580994248
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.0985954999923706,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "stencil",
+      "contract": "cases/stencil1d/contract_ci.yaml",
+      "K": "unwind 8",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=2",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "halo-1d"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "halo-1d:{'N': 4, 'PN': 6}",
+          "params": {
+            "N": 4,
+            "PN": 6
+          },
+          "applied": [
+            "halo-1d"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.14410150004550815,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "halo-1d:{'N': 4, 'PN': 6}",
+      "winner_params": {
+        "N": 4,
+        "PN": 6
+      },
+      "winner_applied": [
+        "halo-1d"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.14410150004550815,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "N": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "representation",
+      "pipeline": "contract machsuite-stencil-1d-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'N': 4}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=2\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.1s): pool of 1 (performance catalog has 9 rewrites, added halo-1d:{'N': 4, 'PN': 6})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate halo-1d:{'N': 4, 'PN': 6}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\stencil\\out.c\n  log:\n    CEGIS try 1: {'N': 4, 'PN': 6} -> proved(0.1s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0012883000308647752,
+        "S2 TheoryLower": 0.00021329999435693026,
+        "S3 Baseline-Directed CEGIS": 8.00006091594696e-07,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 0.14867710007820278,
+        "S6 WinnerSelection": 1.300009898841381e-06,
+        "S7 Emit": 0.0005442999536171556
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.12973499996587634,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "fir",
+      "contract": "cases/fir_block/contract_ci.yaml",
+      "K": "unwind 12",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=8; stuck; remaining cost drivers: mul_nonconst=2, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "align-loop-bound:BLOCK"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "align-loop-bound:BLOCK:{'BLOCK': 8, 'TAPS': 2}",
+          "params": {
+            "BLOCK": 8,
+            "TAPS": 2
+          },
+          "applied": [
+            "align-loop-bound:BLOCK"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 6.984423500020057,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "align-loop-bound:BLOCK:{'BLOCK': 8, 'TAPS': 2}",
+      "winner_params": {
+        "BLOCK": 8,
+        "TAPS": 2
+      },
+      "winner_applied": [
+        "align-loop-bound:BLOCK"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 6.984423500020057,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "BLOCK": 5,
+        "TAPS": 2
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract cmsis-fir-block-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'BLOCK': 5, 'TAPS': 2}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=8; stuck; remaining cost drivers: mul_nonconst=2, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (7.0s): pool of 1 (performance catalog has 9 rewrites, added align-loop-bound:BLOCK:{'BLOCK': 8, 'TAPS': 2})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate align-loop-bound:BLOCK:{'BLOCK': 8, 'TAPS': 2}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\fir\\out.c\n  log:\n    CEGIS try 1: {'BLOCK': 8, 'TAPS': 2} -> proved(7.0s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.001958400011062622,
+        "S2 TheoryLower": 0.0009024000028148293,
+        "S3 Baseline-Directed CEGIS": 6.998889148235321e-07,
+        "S4 BudgetNormalize": 9.00006853044033e-07,
+        "S5 GeneratePool": 6.989303800044581,
+        "S6 WinnerSelection": 1.300009898841381e-06,
+        "S7 Emit": 0.0005899999523535371
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 3.255748499999754,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "ogre",
+      "contract": "cases/ogre_pack/contract_ci.yaml",
+      "K": "unwind 6",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=3; stuck; remaining cost drivers: mul_nonconst=1",
+      "pool_n": 2,
+      "pool_applied": [
+        [
+          "narrow-int-field"
+        ],
+        [
+          "aos-to-soa"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "narrow-int-field:{'N': 4}",
+          "params": {
+            "N": 4
+          },
+          "applied": [
+            "narrow-int-field"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.11432930000592023,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "aos-to-soa:{'N': 4}",
+          "params": {
+            "N": 4
+          },
+          "applied": [
+            "aos-to-soa"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.10983079997822642,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "narrow-int-field:{'N': 4}",
+      "winner_params": {
+        "N": 4
+      },
+      "winner_applied": [
+        "narrow-int-field"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.11432930000592023,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "N": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "representation",
+      "pipeline": "contract ogre-transform-space-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'N': 4}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=3; stuck; remaining cost drivers: mul_nonconst=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.2s): pool of 2 (performance catalog has 9 rewrites, added narrow-int-field:{'N': 4}, aos-to-soa:{'N': 4})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate narrow-int-field:{'N': 4}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\ogre\\out.c\n  log:\n    CEGIS try 1: {'N': 4} -> proved(0.1s)\n    CEGIS try 1: {'N': 4} -> proved(0.1s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0012397000100463629,
+        "S2 TheoryLower": 0.0008279000176116824,
+        "S3 Baseline-Directed CEGIS": 8.00006091594696e-07,
+        "S4 BudgetNormalize": 6.00004568696022e-07,
+        "S5 GeneratePool": 0.23019619996193796,
+        "S6 WinnerSelection": 1.100008375942707e-06,
+        "S7 Emit": 0.0005913999630138278
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.10768779995851219,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "inrange",
+      "contract": "cases/inrange/contract_ci.yaml",
+      "K": "unwind 1",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=0",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "squared-compare"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "squared-compare:{'RBOUND': 80}",
+          "params": {
+            "RBOUND": 80
+          },
+          "applied": [
+            "squared-compare"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.19957669998984784,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "squared-compare:{'RBOUND': 80}",
+      "winner_params": {
+        "RBOUND": 80
+      },
+      "winner_applied": [
+        "squared-compare"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.19957669998984784,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "RBOUND": 80
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract pairwise-inrange-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'RBOUND': 80}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=0\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.2s): pool of 1 (performance catalog has 9 rewrites, added squared-compare:{'RBOUND': 80})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate squared-compare:{'RBOUND': 80}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\inrange\\out.c\n  log:\n    CEGIS try 1: {'RBOUND': 80} -> proved(0.2s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0013882999774068594,
+        "S2 TheoryLower": 8.28000484034419e-05,
+        "S3 Baseline-Directed CEGIS": 7.998896762728691e-07,
+        "S4 BudgetNormalize": 1.00000761449337e-06,
+        "S5 GeneratePool": 0.20333360007498413,
+        "S6 WinnerSelection": 1.9000144675374031e-06,
+        "S7 Emit": 0.0007663000142201781
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 13.711425499990582,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "innerprod",
+      "contract": "cases/innerprod/contract_ci.yaml",
+      "K": "unwind 6",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=5; stuck; remaining cost drivers: mul_nonconst=1, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "narrow-accum"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "narrow-accum:{'LEN': 4}",
+          "params": {
+            "LEN": 4
+          },
+          "applied": [
+            "narrow-accum"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 12.013496899977326,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "narrow-accum:{'LEN': 4}",
+      "winner_params": {
+        "LEN": 4
+      },
+      "winner_applied": [
+        "narrow-accum"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 12.013496899977326,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "LEN": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract float-inner-product-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'LEN': 4}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=5; stuck; remaining cost drivers: mul_nonconst=1, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (12.0s): pool of 1 (performance catalog has 9 rewrites, added narrow-accum:{'LEN': 4})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate narrow-accum:{'LEN': 4}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\innerprod\\out.c\n  log:\n    CEGIS try 1: {'LEN': 4} -> proved(12.0s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0010810999665409327,
+        "S2 TheoryLower": 0.0004509000573307276,
+        "S3 Baseline-Directed CEGIS": 7.00005330145359e-07,
+        "S4 BudgetNormalize": 6.00004568696022e-07,
+        "S5 GeneratePool": 12.016658599954098,
+        "S6 WinnerSelection": 1.100008375942707e-06,
+        "S7 Emit": 0.0006620999192818999
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.657795500010252,
+          "reason": ""
+        }
+      ]
+    },
+    {
+      "id": "luma",
+      "contract": "cases/luma/contract_ci.yaml",
+      "K": "unwind 6",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=2",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "luma-q15"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "luma-q15:{'NPX': 4}",
+          "params": {
+            "NPX": 4
+          },
+          "applied": [
+            "luma-q15"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.11371730000246316,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "luma-q15:{'NPX': 4}",
+      "winner_params": {
+        "NPX": 4
+      },
+      "winner_applied": [
+        "luma-q15"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.11371730000246316,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "NPX": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract bt601-luma-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'NPX': 4}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=2\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.1s): pool of 1 (performance catalog has 9 rewrites, added luma-q15:{'NPX': 4})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate luma-q15:{'NPX': 4}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\luma\\out.c\n  log:\n    CEGIS try 1: {'NPX': 4} -> proved(0.1s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.001078600063920021,
+        "S2 TheoryLower": 0.0001634000800549984,
+        "S3 Baseline-Directed CEGIS": 6.00004568696022e-07,
+        "S4 BudgetNormalize": 9.00006853044033e-07,
+        "S5 GeneratePool": 0.11767559999134392,
+        "S6 WinnerSelection": 1.00000761449337e-06,
+        "S7 Emit": 0.0005487999878823757
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "unknown",
+          "seconds": 60.01519649999682,
+          "reason": "timeout after 60.0s"
+        }
+      ]
+    },
+    {
+      "id": "particles-fat",
+      "contract": "cases/particles_fat/contract_ci.yaml",
+      "K": "unwind 6",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=11; stuck; remaining cost drivers: mul_nonconst=3, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "aos-to-soa"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "aos-to-soa:{'N': 4}",
+          "params": {
+            "N": 4
+          },
+          "applied": [
+            "aos-to-soa"
+          ],
+          "measured": null,
+          "stats": null,
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.7142761999275535,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "aos-to-soa:{'N': 4}",
+      "winner_params": {
+        "N": 4
+      },
+      "winner_applied": [
+        "aos-to-soa"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.7142761999275535,
+          "reason": ""
+        }
+      ],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "N": 4
+      },
+      "baseline_measured": null,
+      "baseline_stats": null,
+      "marker_in_winner": true,
+      "as_if": "representation",
+      "pipeline": "contract particle-fat-aos-ci\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'N': 4}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=11; stuck; remaining cost drivers: mul_nonconst=3, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.7s): pool of 1 (performance catalog has 9 rewrites, added aos-to-soa:{'N': 4})\n  [PASS] S6 WinnerSelection (0.0s): no objective: keep admitted candidate aos-to-soa:{'N': 4}\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\catalog\\particles-fat\\out.c\n  log:\n    CEGIS try 1: {'N': 4} -> proved(0.7s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.001272600027732551,
+        "S2 TheoryLower": 0.0022414999548345804,
+        "S3 Baseline-Directed CEGIS": 7.00005330145359e-07,
+        "S4 BudgetNormalize": 6.00004568696022e-07,
+        "S5 GeneratePool": 0.7224449999630451,
+        "S6 WinnerSelection": 1.200009137392044e-06,
+        "S7 Emit": 0.0005089000333100557
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.6165599999949336,
+          "reason": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# 1D stencil — MachSuite 2D Laplacian reduced so BMC can finish
+#
+# Why this contract: the active domain is N interior points. Ghost/halo cells are
+# a representation of the same zero-edge condition, not a change to the values
+# at those N points. A developer who specified "Dirichlet 0 on the boundary"
+# should accept a padded array whose interior matches the 3-point stencil.
+#
+# Assumptions: integer samples, N=4, |in|≤20 so the sum cannot wrap int32.
+name: machsuite-stencil-1d
+baseline: baseline.c
+parameters:
+  - name: N
+    bits: 32
+    constraints: ["N >= 4", "N <= 4"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 8
+    note: Output equals in[i-1]+in[i]+in[i+1] with missing neighbours 0.
+budget: {}
+verify_timeout_s: 60

@@ -1,0 +1,192 @@
+\section{A Restricted Intent Compiler}
+\label{sec:compiler}
+
+An automated compiler cannot evaluate~\eqref{eq:intent}. Membership in
+\(\mathrm{Sat}(\Phi_{\text{func}})\) is undecidable for interesting
+contracts, by Rice's theorem~\cite{rice1953classes}, and even a decidable
+proof still has a time budget. This section replaces the source
+step~\eqref{eq:intent_source} with a generator, a sound verifier \(V\) with
+budget \(t\), and a fallback. The as-if step~\eqref{eq:intent_lower} remains
+\(\mathcal{L}_{\text{Target}}\). The contract bounds what the compiler may
+do, and what \(V\) proves within \(t\) bounds what it can use.
+
+\subsection{Generator}
+\label{sec:generator}
+
+Let \(R\) be a catalog of source-to-source rewrites, each with a syntactic
+applicability condition and optional side constraints on parameters, for
+example that capacity is a power of two. Let \(D\) be a finite domain for
+parameter holes, as machine integers are. \(R\) and \(D\) are inputs of
+\(\mathrm{Gen}\). The \emph{generated set} is
+\[
+\mathrm{Gen}(P_1, R, D)
+= \{ S[h] \mid S \text{ is obtained from \(P_1\) by a finite sequence of
+rewrites from \(R\)},\ h \in D \}.
+\]
+A program is in \(\mathrm{Gen}\) only if a finite sequence of rewrites from
+\(R\) produces its structure and some \(h \in D\) fills its holes, so a
+cursor-based PID allocator, a linked queue, or a ring that pads storage
+while keeping caller-facing capacity appears only if \(R\) contains that
+rewrite. Rewrites may change observable behavior, and their outputs are
+candidates until verified.
+
+\subsection{Verifier}
+\label{sec:verifier}
+
+A verifier \(V\) takes a program, a contract, and a time budget \(t\) and
+answers \(\mathsf{proved}\), a counterexample, or \(\mathsf{unknown}\). It
+is \emph{sound} if \(\mathsf{proved}\) implies
+\(P \models \Phi_{\text{func}}\) under an exact model of machine arithmetic,
+including overflow.
+
+Many useful verifiers are bounded. A bound \(K\) (operations, unwindings)
+induces a judgment \(P \models_K \Phi_{\text{func}}\): the contract holds on
+every execution the harness covers up to \(K\), and a sound bounded verifier
+may conclude \(\mathsf{proved}\) only for that judgment. Timeouts, solver
+failures, exhausted unwindings, and a property failure on a truncated path
+are \(\mathsf{unknown}\), never \(\mathsf{proved}\).
+
+There are two ways to certify a candidate \(P_2\). A relational check proves
+that \(P_2\) behaves like \(P_1\), taking observational equivalence to
+\(P_1\) as the bound. The
+developer writes no \(\Phi_{\text{func}}\) and the query contains both
+programs. Every candidate outside \([P_1]_\approx\) is then rejected.
+That query inherits
+\(P_1\)'s complexity and may be undecidable, but it is cheap when the
+programs are structurally close. Those checks remain the right tool for a
+small patch when no contract is available~\cite{lopes2021alive2}. A
+decoupled check proves \(P_2 \models \Phi_{\text{func}}\) (or
+\(\models_K\)) directly, taking \(\Phi_{\text{func}}\) as the
+specification. The developer must write that contract, and the query
+contains only the candidate. This check does not inherit \(P_1\)'s complexity, but the
+candidate itself has to lie in a fragment \(V\) can decide, or decide up to
+\(K\). \(P_1\) need not satisfy the contract: it is a starting point for the
+generator and a fallback. Search stays near that baseline so a candidate is
+still a program the developer can read against the sources they already
+have.
+
+This compiler uses the decoupled check, so the \emph{admitted set} at budget
+\(t\) is
+\[
+\mathcal{A}(P_1, \Phi, t)
+= \{ P_2 \in \mathrm{Gen}(P_1, R, D) \mid
+V(P_2, \Phi_{\text{func}}, t) = \mathsf{proved}
+\ \text{and}\ P_2 \text{ passes the check for }\mathcal{B} \}.
+\]
+The two conjuncts are different checks: \(V\) admits on \(\Phi_{\text{func}}\),
+and a provided checker admits on \(\mathcal{B}\), not a second run of \(V\).
+When \(V\) is unbounded and sound, \(\mathcal{A}\) is a subset of
+\(\mathrm{Sat}(\Phi_{\text{func}})\). When \(V\) is bounded, it is a subset
+of the \(K\)-satisfying programs. Only programs in \(\mathrm{Gen}\) are
+submitted to \(V\), and \(\mathsf{unknown}\) shrinks \(\mathcal{A}\) without
+unsounding an emit. A
+bounded model checker or another sound oracle can play \(V\), and they
+differ in which contracts they express and how much of \(\mathrm{Gen}\) they
+reach in \(t\). A synthesizer built on \(V\) can produce only what \(V\) can
+prove~\cite{Srivastava2010VS3}.
+
+\subsection{Backend}
+\label{sec:backend}
+
+The as-if step~\eqref{eq:intent_lower} is unchanged: the restricted compiler
+hands a source program to \(\mathcal{L}_{\text{Target}}\).
+
+\paragraph{Compiler Correctness Assumption.}
+For every program \(P\) and every \(\sigma\) on which \(P\) has no undefined
+behavior, \(\llbracket \mathcal{L}_{\text{Target}}(P) \rrbracket(\sigma)\)
+and \(\llbracket P \rrbracket(\sigma)\) have the same observable part. That
+is the as-if rule as compilers implement it, trusted rather than verified.
+
+Proposition~\ref{prop:refine} already says that an as-if program with the
+same \(\theta\) remains legal. \(\mathcal{L}_{\text{Target}}\) is that as-if
+on inputs where the source has no undefined behavior, and it keeps
+\(\theta\), so the unbounded case of the next lemma is that proposition
+instantiated at \(P' = \mathcal{L}_{\text{Target}}(P^\star)\). The bounded
+judgment is the same fact on the traces \(\models_K\) covers.
+
+\begin{lemma}[Lowering Preserves a Proved Contract]
+\label{lem:lowering}
+If \(P^* \models \Phi_{\text{func}}\) (respectively \(\models_K\)), then
+\(\mathcal{L}_{\text{Target}}(P^*) \models \Phi_{\text{func}}\)
+(respectively \(\models_K\)).
+\end{lemma}
+
+\noindent\emph{Proof sketch.} Implementation parameters remain those of the
+source. \(P^*\) has no undefined behavior on inputs in \(\mathit{Pre}\) (or
+on the traces \(\models_K\) covers), so the compiler correctness assumption
+applies, and Proposition~\ref{prop:refine} gives the unbounded case.
+(Appendix~\ref{app:proofs}.)
+
+The lemma needs a contract over observable results and a candidate that is
+UB-free on the covered inputs, so the trusted base is the production
+compiler, the verifier, and the encoding of the language into the verifier's
+logic, which is larger than that of a verified compiler or of Fiat's
+end-to-end proofs~\cite{leroy2009backend,delaware2015fiat}.
+
+\subsection{Selection and Fallback}
+\label{sec:selection}
+
+Winner selection lowers the baseline and every admitted candidate and keeps
+the binary with the lowest \emph{measured} cost:
+\begin{equation}
+\label{eq:winner}
+\mathrm{Bin}^* = \arg\min_{\mathrm{Bin} \in \{\mathcal{L}_{\text{Target}}(P)
+\mid P \in \mathcal{A} \cup \{P_1\}\}}
+\mathcal{O}(\mathrm{Bin}, \text{Target}),
+\end{equation}
+preferring \(P_1\) on ties. Each admitted source, and \(P_1\), is compiled
+with \(\mathcal{L}_{\text{Target}}\) and ranked by measured cost on the
+profiled workload and hardware, and the emitted artifact is the winning
+source, not an object file.
+
+If \(\mathcal{A}\) is empty, the compiler emits \(P_1\) unchanged. A change
+is admitted only after a proof of \(\Phi_{\text{func}}\) (or \(\models_K\)).
+Callers whose tests depended on incidental behavior the contract left open
+can still observe a difference.
+
+\subsection{What the Restricted Compiler Guarantees}
+\label{sec:restricted_thm}
+
+\begin{theorem}[Soundness of a Restricted Intent Compiler]
+\label{thm:restricted}
+Let \(V\) be sound for \(\models\) or for \(\models_K\), and let the compiler
+emit source \(P^*\) and binary
+\(\mathrm{Bin}^* = \mathcal{L}_{\text{Target}}(P^*)\).
+\begin{enumerate}
+  \item If \(P^* \neq P_1\), then \(P^*\) is in \(\mathrm{Gen}(P_1, R, D)\),
+  \(V\) proved it, and it passed \(\mathcal{B}\). Hence
+  \(P^* \models \Phi_{\text{func}}\) or \(P^* \models_K \Phi_{\text{func}}\),
+  matching \(V\), and the same judgment holds of \(\mathrm{Bin}^*\) by
+  Lemma~\ref{lem:lowering}.
+  \item The measured cost of \(\mathrm{Bin}^*\) is at most that of
+  \(\mathcal{L}_{\text{Target}}(P_1)\), when measurement runs.
+  \item If \(P_1 \models \Phi_{\text{func}}\) (or \(\models_K\)), then
+  \(\mathrm{Bin}^*\) satisfies the same judgment in every case.
+\end{enumerate}
+\end{theorem}
+
+\noindent\emph{Proof sketch.} Winner selection returns \(P_1\) or a member
+of \(\mathcal{A}\). Membership in \(\mathcal{A}\) is part 1. Part 2 is
+minimization over a set that contains the compiled baseline. Part 3 uses
+part 1 or Lemma~\ref{lem:lowering} on \(P_1\).
+(Appendix~\ref{app:proofs}.)
+
+If \(P_1\) already satisfies the contract, every emit does. If it does not,
+the compiler replaces it only with a proved program or leaves it as written,
+so the emit is never less safe than compiling \(P_1\) with
+\(\mathcal{L}_{\text{Target}}\) alone. If some generated hole assignment of
+a given sketch satisfies the contract and \(V\) decides every query, a
+baseline-directed search that enumerates \(D\) in order of distance to
+\(\theta_{P_1}\) returns a closest satisfying assignment
+(Theorem~\ref{thm:cegis}). If no generated program satisfies the contract,
+the compiler keeps \(P_1\), and a different structure requires a rewrite in
+\(R\).
+
+The compiler ranks by \(\mathcal{O}\) among programs \(V\) has proved.
+How \(\mathrm{Gen}\) is explored, including any score that orders rewrites,
+does not change that ranking. Verification cost and execution cost need not
+agree~\cite{wagner2013overify,rinard2026quantitative}, so the fastest program
+may lie outside \(\mathcal{A}\). They agree on the ring: integer division is
+expensive on the processor and expensive to
+bit-blast~\cite{niemetz2024bitblasting}, and the rewrite that removes the
+remainder also simplifies the proof.

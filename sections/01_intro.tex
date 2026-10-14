@@ -1,0 +1,101 @@
+\section{Introduction}
+\label{sec:intro}
+
+An optimizing compiler may replace a program with any program that has the same
+observable behavior, commonly referred to as the as-if rule of ISO
+C++~\cite{n4950}. That rule lets compilers reorder, inline, vectorize,
+and eliminate code, and it makes the source the complete specification. Every
+detail the source fixes is one the compiler must preserve, whether the developer
+cared about it or not.
+
+Source code mixes two kinds of decisions. Domain invariants are what the program
+must actually guarantee, such as packets leaving a queue in the order they
+arrived and the queue holding at least a thousand packets before it drops.
+Incidental choices are details the code had to fix in order to run, such as a
+capacity of exactly 1000 or a remainder instruction that maps a counter onto
+that capacity. A packet queue written for bursts of 800 packets with 25\%
+headroom needs at least 1000 slots. The developer writes 1000, and each enqueue
+computes \texttt{slot = i \% 1000}, which compiles to a chain of multiplications
+and shifts. With 1024 slots the same index is a bitwise \texttt{and}. Both sizes
+meet the requirement, and the as-if rule allows only the size in the source,
+because the two queues disagree once they hold 1000 packets.
+
+Developers split these decisions by hand. Folly's single-producer queue rounds
+its backing array up to a power of two and indexes with a mask, while
+\texttt{isFull} still respects the capacity the caller asked
+for~\cite{folly_pcq}. DPDK's exact-size rings do the same
+separation~\cite{dpdk_rte_ring}. ClickHouse sizes hash tables in powers of two
+and places keys with a mask~\cite{clickhouse_hashtable}. Those libraries write
+the split into the source, and a compiler bound by as-if cannot introduce it from
+a baseline that used 1000 and a remainder. This paper asks for that compiler.
+
+Compiling against a specification instead of the source is an old idea. Leroy
+defines compilers that preserve a specification rather than exact
+behavior~\cite{leroy2009backend}. Refinement calculi derive implementations from
+specifications~\cite{back1998refinement,morgan1994programming}. Fiat, Cozy, and
+Primrose choose among the implementations a specification admits, Primrose
+as annotations on Rust~\cite{delaware2015fiat,loncaric2016cozy,Qin2023Primrose}. STOKE
+optimizes floating-point code against a stated error bound rather than
+equivalence~\cite{schkufza2014fp}. This paper asks what that idea is, as a
+compilation problem for ordinary systems code, and what an automated compiler
+can actually do with it.
+
+The answer has three layers.
+
+\paragraph{The Ideal Problem.}
+The developer states a functional contract \(\Phi_{\text{func}}\) over
+observable behavior, including named implementation parameters such as a
+capacity of at least 1000, together with a resource budget and a cost
+objective. Programs that satisfy \(\Phi_{\text{func}}\) are legal, and
+those that also satisfy the budget are feasible. The ideal compiler
+returns a cheapest feasible legal program. That legal set contains every
+as-if variant of a correct baseline, and more programs exactly where
+\(\Phi_{\text{func}}\) leaves a decision open.
+
+\paragraph{A Restricted Compiler.}
+\textsc{IntentCompile} proposes candidates from a generator (rewrites and
+parameter holes), admits those a sound verifier proves within a time budget,
+and hands the winner to an unmodified production compiler. What it can use
+is the verified fragment of the generated set, and it emits \(P_1\) or a
+program cheaper on the supplied \(\mathcal{O}\).
+
+\paragraph{An Instance.}
+\textsc{IntC} is a C instance of \textsc{IntentCompile}. It takes a C
+baseline, a contract written as parameter constraints plus CBMC harnesses,
+and an optional benchmark.
+It rewrites remainder, division, and multiplication by a parameter. It also
+applies representation rewrites: pad-and-mask, which grows a private store
+while keeping API capacity, and structure-of-arrays. Arithmetic rewrites drop
+a sqrt from a disk test or a double accumulator from an inner product. It fills
+parameter holes by search near the baseline, admits candidates a bounded model
+checker proves, and selects by measurement. On the FIFO ring, that winner is
+the 1024-cell mask, \(2.3\times\) on the named benchmark. What it claims of an admitted
+program is \(\models_K\): the harness holds on every execution the bound
+covers. It emits reviewable source so a developer can inspect an admitted
+change as C, including a change that disagrees with the baseline on an
+observable result.
+
+\paragraph{Contributions.}
+\begin{itemize}
+  \item The compilation problem: contracts with named implementation
+  parameters, four kinds of slack, and an ideal objective over the legal set
+  (\S\ref{sec:ideal}).
+  \item A restricted compiler whose search space is a generator, whose
+  admission is a sound verifier, including the bounded judgment
+  \(\models_K\), and whose backend is an unmodified production compiler
+  (\S\ref{sec:compiler}).
+  \item The \textsc{IntentCompile} pipeline and \textsc{IntC}, a C instance
+  of it (\S\ref{sec:pipeline}, \S\ref{sec:implementation}).
+  \item Evaluation of \textsc{IntC} (\S\ref{sec:evaluation}): whether it
+  runs on extracts from real-world projects, whether as-if compilation and
+  the internals behave as claimed, and whether ranking under the same
+  \texttt{/O2} emits a cheaper program on the named driver or keeps
+  \(P_1\). On the ring that driver is \(2.3\times\).
+\end{itemize}
+
+Section~\ref{sec:overview} walks through the ring buffer and what existing
+tools can do with it. Sections~\ref{sec:ideal}--\ref{sec:compiler} are the two
+theory layers. Sections~\ref{sec:pipeline}--\ref{sec:implementation} are the
+algorithm and the artifact. Section~\ref{sec:evaluation} answers the three questions of \textsc{IntC}.
+Section~\ref{sec:related} places the work. Section~\ref{sec:discussion}
+names the risks that remain. Section~\ref{sec:conclusion} closes.

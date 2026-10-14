@@ -1,0 +1,183 @@
+\section{Overview}
+\label{sec:overview}
+
+\subsection{Motivating Example}
+\label{sec:motivating_example}
+
+A network ingress path buffers packets in a ring so that bursts do not cause
+drops. Bursts reach 800 packets, and the developer provisions 25\% headroom, so
+the ring needs at least 1000 slots. The queue keeps two free-running 64-bit
+counters. \texttt{tail} counts enqueued packets and \texttt{head} counts
+dequeued ones. The queue holds \texttt{tail - head} packets. Each counter value
+maps to a storage slot by taking it modulo the capacity.
+
+\begin{lstlisting}[language=C]
+#define CAPACITY 1000
+uint64_t ring[CAPACITY];
+uint64_t head = 0, tail = 0;
+
+bool enqueue(const uint64_t pkt) {
+    if (tail - head == CAPACITY) return false;
+    ring[tail % CAPACITY] = pkt;
+    ++tail;
+    return true;
+}
+\end{lstlisting}
+
+Every enqueue and dequeue computes a remainder by 1000. MSVC~19.29 at
+\texttt{/O2} on x86-64 compiles that remainder to a reciprocal multiply:
+
+\begin{lstlisting}[language={[x86masm]Assembler}]
+; i % 1000
+mov  rax, 442721857769029239
+mul  rcx
+mov  rax, rcx
+sub  rax, rdx
+shr  rax, 1
+add  rax, rdx
+shr  rax, 9
+imul rax, rax, 1000
+sub  rcx, rax
+mov  rax, rcx
+ret
+\end{lstlisting}
+
+A 1024-cell ring uses \texttt{i \% 1024}, which is the same as
+\texttt{i \& 1023}, and the same compiler emits a mask:
+
+\begin{lstlisting}[language={[x86masm]Assembler}]
+; i % 1024
+and  ecx, 1023
+mov  eax, ecx
+ret
+\end{lstlisting}
+
+Table~\ref{tab:motivating} splits the requirement, the source, what an as-if
+compiler may emit, and what a contract admits. As-if will not rewrite 1000 to
+1024, because the two queues disagree on the 1001st consecutive enqueue from
+empty. In isolation, on an Intel Core i7-14700K, a dependent chain of slot
+computations takes a median of 2.67\,ns per step with capacity 1000 and
+0.39\,ns with capacity 1024, a factor of 6.8. When the computations are
+independent, the factor is 3.1. These figures measure the slot computation
+alone. Whole queues, where memory traffic dilutes the difference, are measured
+in Section~\ref{sec:evaluation}, and the larger ring uses 24 more slots.
+
+Both capacities meet a requirement of at least 1000 slots. Which is better
+depends on the deployment. On a server where the path is latency-critical and
+memory is plentiful, 1024 is the better choice. On a microcontroller whose
+memory budget is exactly the 1000-slot footprint, the extra 24 slots do not
+fit. The preference is specific to the target, so neither capacity is right
+in the source as a universal constant.
+
+\begin{table}
+\caption{Columns are the requirement, the source \(P_1\), what MSVC
+\texttt{/O2} emits under as-if, and a program the contract admits. As-if
+must keep the remainder that is in the source. A contract with
+\texttt{CAPACITY}~\(\ge 1000\) admits 1024.}
+\label{tab:motivating}
+\scriptsize
+\begin{tabular}{p{0.22\linewidth}p{0.22\linewidth}p{0.22\linewidth}p{0.22\linewidth}}
+\toprule
+Requirement & Source \(P_1\) & MSVC \texttt{/O2} (as-if) & Contract admits \\
+\midrule
+\(\texttt{CAPACITY} \ge 1000\), FIFO, full at \texttt{CAPACITY} &
+\texttt{\#define CAPACITY 1000}; \texttt{i \% CAPACITY} &
+reciprocal multiply for \texttt{\% 1000}; 1001st enqueue fails &
+\texttt{CAPACITY 1024}; \texttt{i \& 1023}; 1001st enqueue succeeds \\
+full at 1000; backing store not in the API &
+\texttt{CAPACITY} and \texttt{STORAGE} both 1000; \texttt{i \% STORAGE} &
+keeps remainder-by-1000 &
+\texttt{STORAGE 1024}, \texttt{CAPACITY 1000}; mask; enqueue still fails at 1000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+That change is not the only way to use a power-of-two backing store. A library
+can allocate 1024 slots and still report full at 1000, using the extra slots
+only so that indexing is a mask. Folly's queue after September 2026 does
+exactly that: it rounds storage up internally and keeps the caller-facing
+capacity~\cite{folly_pcq}. The two designs use the same hardware trick and are different contracts: one
+changes when enqueue fails, and the other does not.
+
+\subsection{What Existing Tools Can Do}
+\label{sec:existing}
+
+\paragraph{Conventional Compilers and Translation Validation.}
+The two queues that become full at different lengths are not observationally
+equivalent. Translation validators such as Alive2~\cite{lopes2021alive2} check
+refinement against the source, which allows extra freedom only where the source
+has undefined behavior, and this queue has none on its intended inputs.
+Alive2 rejects the 1024-cell ring against the 1000-cell source: the two
+disagree on the 1001st enqueue from empty.
+
+\paragraph{Compiler Flags.}
+Production compilers already relax as-if under flags, and
+\texttt{-ffast-math} is one example: it licenses reassociation and other
+algebraic rewrites that IEEE-754 would forbid, and the waiver can be scoped
+with pragmas. Those rewrites change observable numeric behavior, including
+treating NaN and infinities as unused, sometimes with measurable
+implications, but they do not let the compiler replace a 1000-cell remainder
+with a 1024-cell mask.
+
+\paragraph{Compiler Data-Layout Transformations.}
+Production compilers do change data layout. IBM's XL compilers reshape arrays
+of structures~\cite{zhao2007forma}, HP's compilers split and reorder
+structures~\cite{hundt2006practical}, and automatic pool allocation regroups
+heap objects~\cite{lattner2005pool}. These transformations must remain
+invisible to the program. They are often abandoned when the analysis cannot
+prove that~\cite{hundt2006practical}, and changing a logical capacity is
+visible by construction, so it is outside their reach. Padding a private array while
+preserving the API is closer to what they already do, and still requires
+proving that the extra cells are never observed.
+
+\paragraph{Annotations and Assumptions.}
+C++'s \texttt{[[assume]]} states facts the compiler may rely on. A false
+assumption is undefined behavior, and the C++26 contracts design leaves out an
+assume semantic for that reason~\cite{p2899r1}. Recent Clang attributes permit
+array-of-structures to structure-of-arrays conversions on annotated
+code~\cite{radtke2025annotation}. Both are trusted rather than checked, and
+neither states that a capacity may grow.
+
+\paragraph{Scheduling Languages.}
+Halide and Exo separate an algorithm from its schedule~\cite{ragan2013halide,
+ikarashi2022exo}. The algorithm's meaning, including the size of the ring,
+stays fixed.
+
+\paragraph{Specification-Based Synthesis.}
+Cozy synthesizes collection implementations from specifications, and Primrose
+selects container implementations that satisfy stated
+properties~\cite{loncaric2016cozy,Qin2023Primrose}. Fiat refines specifications
+into verified implementations in Coq~\cite{delaware2015fiat}. These systems
+accept freedom from a specification, in their own languages or libraries.
+Primrose comes closest to existing code: it reads annotated Rust and selects a
+library implementation. This paper starts from an existing C program, a
+contract over its observable behavior, and that language's production compiler.
+
+\subsection{Intent Compilation on the Example}
+\label{sec:overview_intent}
+
+The developer states the requirement instead of a single capacity. In
+\textsc{IntC} that is a YAML file plus C harnesses. The contract has four pieces:
+a constraint on named parameters, a functional harness, an optional resource
+budget, and a measured objective. On this queue:
+
+\begin{lstlisting}[language=C]
+/* CAPACITY >= 1000 */
+/* FIFO; enqueue fails iff the ring holds CAPACITY packets */
+/* optional static-memory ceiling */
+/* measured ns/op on a given target */
+\end{lstlisting}
+
+\textsc{IntentCompile} (\S\ref{sec:pipeline}) rewrites \texttt{e \% CAPACITY} to
+\texttt{((e) \& (CAPACITY - 1))}, which requires a power-of-two capacity, searches
+for the admissible power of two closest to 1000, and asks a bounded model
+checker whether every sequence of at most \(K\) operations from an empty queue
+satisfies the harness (the bound of \(\models_K\), \S\ref{sec:verifier}).
+Under a server profile with no tight memory budget, 1024
+is admitted and, if it measures faster, emitted as source. Under an 8016-byte
+static-memory ceiling (the 1000-slot baseline's footprint), 1024 fails the
+budget at 8208 bytes and the baseline is kept.
+It also tries a pad-and-mask form: a \texttt{STORAGE} hole, a mask on that
+store, and fullness still at \texttt{CAPACITY}. That candidate is the
+unexposed-slack case of Section~\ref{sec:slack}. When the baseline already names
+both parameters, the mask rewrite on \texttt{STORAGE} is enough.

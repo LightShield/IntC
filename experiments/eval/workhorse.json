@@ -1,0 +1,1462 @@
+{
+  "meta": {
+    "when": "2026-10-13T21:51:33.160622+00:00",
+    "machine": "see paper \u00a77"
+  },
+  "rows": [
+    {
+      "id": "ring",
+      "contract": "cases/ringbuffer/contract.yaml",
+      "K": "10",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=21 ; pow2-mask@406 -> kappa=11 ; pow2-mask@554 -> kappa=1",
+      "pool_n": 2,
+      "pool_applied": [
+        [
+          "pow2-mask@406",
+          "pow2-mask@554"
+        ],
+        [
+          "pad-and-mask"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}",
+          "params": {
+            "CAPACITY": 1024
+          },
+          "applied": [
+            "pow2-mask@406",
+            "pow2-mask@554"
+          ],
+          "measured": 0.487,
+          "stats": {
+            "median": 0.487,
+            "mean": 0.48762258064516134,
+            "stdev": 0.008147298516580798,
+            "min": 0.4769,
+            "max": 0.52,
+            "q1": 0.48175,
+            "q3": 0.49,
+            "n": 31,
+            "values": [
+              0.4821,
+              0.4882,
+              0.487,
+              0.4846,
+              0.5028,
+              0.4942,
+              0.4834,
+              0.4804,
+              0.4814,
+              0.4811,
+              0.4794,
+              0.4898,
+              0.4837,
+              0.488,
+              0.4881,
+              0.4922,
+              0.4866,
+              0.4884,
+              0.4911,
+              0.52,
+              0.4831,
+              0.4769,
+              0.4805,
+              0.4806,
+              0.4814,
+              0.4953,
+              0.487,
+              0.4902,
+              0.4886,
+              0.491,
+              0.4892
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 47.75415139994584,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "pad-and-mask:{'CAPACITY': 1000, 'STORAGE': 1024}",
+          "params": {
+            "CAPACITY": 1000,
+            "STORAGE": 1024
+          },
+          "applied": [
+            "pad-and-mask"
+          ],
+          "measured": 0.4896,
+          "stats": {
+            "median": 0.4896,
+            "mean": 0.4900548387096774,
+            "stdev": 0.009641329047722184,
+            "min": 0.477,
+            "max": 0.5184,
+            "q1": 0.4829,
+            "q3": 0.4934,
+            "n": 31,
+            "values": [
+              0.479,
+              0.4786,
+              0.4874,
+              0.4896,
+              0.4888,
+              0.4935,
+              0.4904,
+              0.4937,
+              0.4863,
+              0.5061,
+              0.4898,
+              0.4902,
+              0.5184,
+              0.4827,
+              0.4813,
+              0.4851,
+              0.4856,
+              0.4831,
+              0.4951,
+              0.4927,
+              0.5099,
+              0.477,
+              0.4795,
+              0.4827,
+              0.4779,
+              0.4877,
+              0.4933,
+              0.4908,
+              0.4995,
+              0.4925,
+              0.5035
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 43.92974849999882,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}",
+      "winner_params": {
+        "CAPACITY": 1024
+      },
+      "winner_applied": [
+        "pow2-mask@406",
+        "pow2-mask@554"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 47.75415139994584,
+          "reason": ""
+        }
+      ],
+      "winner_measured": 0.487,
+      "winner_stats": {
+        "median": 0.487,
+        "mean": 0.48762258064516134,
+        "stdev": 0.008147298516580798,
+        "min": 0.4769,
+        "max": 0.52,
+        "q1": 0.48175,
+        "q3": 0.49,
+        "n": 31,
+        "values": [
+          0.4821,
+          0.4882,
+          0.487,
+          0.4846,
+          0.5028,
+          0.4942,
+          0.4834,
+          0.4804,
+          0.4814,
+          0.4811,
+          0.4794,
+          0.4898,
+          0.4837,
+          0.488,
+          0.4881,
+          0.4922,
+          0.4866,
+          0.4884,
+          0.4911,
+          0.52,
+          0.4831,
+          0.4769,
+          0.4805,
+          0.4806,
+          0.4814,
+          0.4953,
+          0.487,
+          0.4902,
+          0.4886,
+          0.491,
+          0.4892
+        ]
+      },
+      "baseline_params": {
+        "CAPACITY": 1000
+      },
+      "baseline_measured": 1.1279,
+      "baseline_stats": {
+        "median": 1.1279,
+        "mean": 1.128916129032258,
+        "stdev": 0.017426475963777926,
+        "min": 1.0996,
+        "max": 1.1664,
+        "q1": 1.11835,
+        "q3": 1.1372499999999999,
+        "n": 31,
+        "values": [
+          1.1381,
+          1.1097,
+          1.1253,
+          1.1327,
+          1.1344,
+          1.1381,
+          1.1664,
+          1.1619,
+          1.1552,
+          1.1364,
+          1.119,
+          1.1308,
+          1.1485,
+          1.1314,
+          1.1217,
+          1.1177,
+          1.1429,
+          1.1215,
+          1.1196,
+          1.1003,
+          1.0996,
+          1.11,
+          1.1036,
+          1.1139,
+          1.1273,
+          1.1116,
+          1.1308,
+          1.1272,
+          1.1279,
+          1.1316,
+          1.1613
+        ]
+      },
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract ringbuffer-burst-queue\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'CAPACITY': 1000}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=21 ; pow2-mask@406 -> kappa=11 ; pow2-mask@554 -> kappa=1\n  [PASS] S3 Baseline-Directed CEGIS (47.8s): seeds: pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (43.9s): pool of 2 (performance catalog has 9 rewrites, added pad-and-mask:{'CAPACITY': 1000, 'STORAGE': 1024})\n  [PASS] S6 WinnerSelection (3.6s): winner pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}: 0.487 \u00b1 0.008 vs baseline 1.128 \u00b1 0.017 ns_per_op\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\ring\\out.c\n  log:\n    CEGIS try 1: {'CAPACITY': 1024} -> proved(47.8s)\n    CEGIS try 1: {'CAPACITY': 1000, 'STORAGE': 1024} -> proved(43.9s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.001308299950323999,
+        "S2 TheoryLower": 0.0015923000173643231,
+        "S3 Baseline-Directed CEGIS": 47.761987300007604,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 43.93799659993965,
+        "S6 WinnerSelection": 3.563020800007507,
+        "S7 Emit": 0.0005210000090301037
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    },
+    {
+      "id": "hash",
+      "contract": "cases/hashset/contract.yaml",
+      "K": "4",
+      "S2_ok": true,
+      "S2_details": "stuck; kappa=44 ; pow2-mask@456 -> kappa=34 ; pow2-mask@552 -> kappa=24 ; pow2-mask@816 -> kappa=14 ; pow2-mask@912 -> kappa=4; stuck; remaining cost drivers: loop=2",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "pow2-mask@456",
+          "pow2-mask@552",
+          "pow2-mask@816",
+          "pow2-mask@912"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384}",
+          "params": {
+            "NBUCKETS": 16384
+          },
+          "applied": [
+            "pow2-mask@456",
+            "pow2-mask@552",
+            "pow2-mask@816",
+            "pow2-mask@912"
+          ],
+          "measured": 4.0,
+          "stats": {
+            "median": 4.0,
+            "mean": 4.010422580645161,
+            "stdev": 0.04273026023539931,
+            "min": 3.9584,
+            "max": 4.1651,
+            "q1": 3.9898,
+            "q3": 4.0184,
+            "n": 31,
+            "values": [
+              3.9889,
+              4.0052,
+              3.9681,
+              4.0,
+              3.9689,
+              3.9839,
+              3.9913,
+              3.9584,
+              3.9992,
+              4.1651,
+              3.9973,
+              4.0263,
+              4.0386,
+              3.9854,
+              3.9733,
+              3.9957,
+              3.9818,
+              4.0183,
+              4.0001,
+              4.0096,
+              3.9943,
+              4.0185,
+              3.9907,
+              3.9932,
+              4.0049,
+              4.0066,
+              4.0215,
+              4.1214,
+              4.0738,
+              4.0395,
+              4.0033
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 62.35284609999508,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384}",
+      "winner_params": {
+        "NBUCKETS": 16384
+      },
+      "winner_applied": [
+        "pow2-mask@456",
+        "pow2-mask@552",
+        "pow2-mask@816",
+        "pow2-mask@912"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 62.35284609999508,
+          "reason": ""
+        }
+      ],
+      "winner_measured": 4.0,
+      "winner_stats": {
+        "median": 4.0,
+        "mean": 4.010422580645161,
+        "stdev": 0.04273026023539931,
+        "min": 3.9584,
+        "max": 4.1651,
+        "q1": 3.9898,
+        "q3": 4.0184,
+        "n": 31,
+        "values": [
+          3.9889,
+          4.0052,
+          3.9681,
+          4.0,
+          3.9689,
+          3.9839,
+          3.9913,
+          3.9584,
+          3.9992,
+          4.1651,
+          3.9973,
+          4.0263,
+          4.0386,
+          3.9854,
+          3.9733,
+          3.9957,
+          3.9818,
+          4.0183,
+          4.0001,
+          4.0096,
+          3.9943,
+          4.0185,
+          3.9907,
+          3.9932,
+          4.0049,
+          4.0066,
+          4.0215,
+          4.1214,
+          4.0738,
+          4.0395,
+          4.0033
+        ]
+      },
+      "baseline_params": {
+        "NBUCKETS": 10007
+      },
+      "baseline_measured": 9.4554,
+      "baseline_stats": {
+        "median": 9.4554,
+        "mean": 9.450119354838709,
+        "stdev": 0.09738274460209354,
+        "min": 9.2791,
+        "max": 9.7187,
+        "q1": 9.40845,
+        "q3": 9.51835,
+        "n": 31,
+        "values": [
+          9.4244,
+          9.7187,
+          9.4653,
+          9.4338,
+          9.4135,
+          9.4554,
+          9.4034,
+          9.3778,
+          9.56,
+          9.4286,
+          9.5032,
+          9.5228,
+          9.5196,
+          9.5592,
+          9.5396,
+          9.4431,
+          9.4641,
+          9.5551,
+          9.4168,
+          9.2876,
+          9.315,
+          9.3715,
+          9.3006,
+          9.2791,
+          9.2925,
+          9.4613,
+          9.5024,
+          9.5437,
+          9.5171,
+          9.4621,
+          9.4164
+        ]
+      },
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract hashset-open-addressing\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'NBUCKETS': 10007}\n  [PASS] S2 TheoryLower (0.0s): stuck; kappa=44 ; pow2-mask@456 -> kappa=34 ; pow2-mask@552 -> kappa=24 ; pow2-mask@816 -> kappa=14 ; pow2-mask@912 -> kappa=4; stuck; remaining cost drivers: loop=2\n  [PASS] S3 Baseline-Directed CEGIS (62.4s): seeds: pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384}\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.0s): pool of 1 (performance catalog has 9 rewrites, added none)\n  [PASS] S6 WinnerSelection (8.5s): winner pow2-mask@456+pow2-mask@552+pow2-mask@816+pow2-mask@912:{'NBUCKETS': 16384}: 4.000 \u00b1 0.043 vs baseline 9.455 \u00b1 0.097 ns_per_op\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\hash\\out.c\n  log:\n    CEGIS try 1: {'NBUCKETS': 16384} -> proved(62.4s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0011581999715417624,
+        "S2 TheoryLower": 0.007298200041987002,
+        "S3 Baseline-Directed CEGIS": 62.36416310002096,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 0.0021902999142184854,
+        "S6 WinnerSelection": 8.474559099995531,
+        "S7 Emit": 0.0006943000480532646
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": true,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    },
+    {
+      "id": "inrange",
+      "contract": "cases/inrange/contract.yaml",
+      "K": "unwind 1",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=0",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "squared-compare"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "squared-compare:{'RBOUND': 80}",
+          "params": {
+            "RBOUND": 80
+          },
+          "applied": [
+            "squared-compare"
+          ],
+          "measured": 0.1081,
+          "stats": {
+            "median": 0.1081,
+            "mean": 0.1109258064516129,
+            "stdev": 0.014720438574579121,
+            "min": 0.0987,
+            "max": 0.1646,
+            "q1": 0.10014999999999999,
+            "q3": 0.1132,
+            "n": 31,
+            "values": [
+              0.0988,
+              0.1646,
+              0.1444,
+              0.1297,
+              0.1268,
+              0.1111,
+              0.1001,
+              0.1156,
+              0.1081,
+              0.1073,
+              0.1092,
+              0.1002,
+              0.0996,
+              0.0987,
+              0.099,
+              0.1088,
+              0.1138,
+              0.1073,
+              0.1092,
+              0.1226,
+              0.1012,
+              0.1091,
+              0.1126,
+              0.124,
+              0.1012,
+              0.0991,
+              0.1027,
+              0.1054,
+              0.099,
+              0.0992,
+              0.1103
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.28232569992542267,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "squared-compare:{'RBOUND': 80}",
+      "winner_params": {
+        "RBOUND": 80
+      },
+      "winner_applied": [
+        "squared-compare"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.28232569992542267,
+          "reason": ""
+        }
+      ],
+      "winner_measured": 0.1081,
+      "winner_stats": {
+        "median": 0.1081,
+        "mean": 0.1109258064516129,
+        "stdev": 0.014720438574579121,
+        "min": 0.0987,
+        "max": 0.1646,
+        "q1": 0.10014999999999999,
+        "q3": 0.1132,
+        "n": 31,
+        "values": [
+          0.0988,
+          0.1646,
+          0.1444,
+          0.1297,
+          0.1268,
+          0.1111,
+          0.1001,
+          0.1156,
+          0.1081,
+          0.1073,
+          0.1092,
+          0.1002,
+          0.0996,
+          0.0987,
+          0.099,
+          0.1088,
+          0.1138,
+          0.1073,
+          0.1092,
+          0.1226,
+          0.1012,
+          0.1091,
+          0.1126,
+          0.124,
+          0.1012,
+          0.0991,
+          0.1027,
+          0.1054,
+          0.099,
+          0.0992,
+          0.1103
+        ]
+      },
+      "baseline_params": {
+        "RBOUND": 80
+      },
+      "baseline_measured": 0.7019,
+      "baseline_stats": {
+        "median": 0.7019,
+        "mean": 0.7064064516129032,
+        "stdev": 0.024240241135817533,
+        "min": 0.692,
+        "max": 0.8309,
+        "q1": 0.69745,
+        "q3": 0.70495,
+        "n": 31,
+        "values": [
+          0.6977,
+          0.711,
+          0.7137,
+          0.6981,
+          0.6951,
+          0.6953,
+          0.692,
+          0.7082,
+          0.6958,
+          0.7176,
+          0.6975,
+          0.7019,
+          0.698,
+          0.6994,
+          0.697,
+          0.8309,
+          0.7019,
+          0.705,
+          0.7033,
+          0.6978,
+          0.7038,
+          0.7038,
+          0.6945,
+          0.7237,
+          0.7049,
+          0.7027,
+          0.7039,
+          0.6974,
+          0.7124,
+          0.7011,
+          0.6932
+        ]
+      },
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract pairwise-inrange\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'RBOUND': 80}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=0\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.3s): pool of 1 (performance catalog has 9 rewrites, added squared-compare:{'RBOUND': 80})\n  [PASS] S6 WinnerSelection (0.3s): winner squared-compare:{'RBOUND': 80}: 0.108 \u00b1 0.015 vs baseline 0.702 \u00b1 0.024 ns_per_pair\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\inrange\\out.c\n  log:\n    CEGIS try 1: {'RBOUND': 80} -> proved(0.3s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0010637999512255192,
+        "S2 TheoryLower": 7.780001033097506e-05,
+        "S3 Baseline-Directed CEGIS": 6.00004568696022e-07,
+        "S4 BudgetNormalize": 8.00006091594696e-07,
+        "S5 GeneratePool": 0.28531950002070516,
+        "S6 WinnerSelection": 0.28140849992632866,
+        "S7 Emit": 0.0004838000750169158
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    },
+    {
+      "id": "innerprod",
+      "contract": "cases/innerprod/contract.yaml",
+      "K": "unwind 6",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=5; stuck; remaining cost drivers: mul_nonconst=1, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "narrow-accum"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "narrow-accum:{'LEN': 4}",
+          "params": {
+            "LEN": 4
+          },
+          "applied": [
+            "narrow-accum"
+          ],
+          "measured": 0.2726,
+          "stats": {
+            "median": 0.2726,
+            "mean": 0.27321612903225806,
+            "stdev": 0.0027069166683631697,
+            "min": 0.2678,
+            "max": 0.2792,
+            "q1": 0.27154999999999996,
+            "q3": 0.27490000000000003,
+            "n": 31,
+            "values": [
+              0.271,
+              0.2769,
+              0.2724,
+              0.2747,
+              0.2726,
+              0.269,
+              0.2713,
+              0.2721,
+              0.2748,
+              0.2792,
+              0.2697,
+              0.2737,
+              0.2742,
+              0.275,
+              0.2742,
+              0.2712,
+              0.2754,
+              0.2726,
+              0.275,
+              0.2723,
+              0.2738,
+              0.272,
+              0.2678,
+              0.2732,
+              0.2789,
+              0.2724,
+              0.2714,
+              0.2717,
+              0.2771,
+              0.2751,
+              0.269
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 11.883877499960363,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "narrow-accum:{'LEN': 4}",
+      "winner_params": {
+        "LEN": 4
+      },
+      "winner_applied": [
+        "narrow-accum"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 11.883877499960363,
+          "reason": ""
+        }
+      ],
+      "winner_measured": 0.2726,
+      "winner_stats": {
+        "median": 0.2726,
+        "mean": 0.27321612903225806,
+        "stdev": 0.0027069166683631697,
+        "min": 0.2678,
+        "max": 0.2792,
+        "q1": 0.27154999999999996,
+        "q3": 0.27490000000000003,
+        "n": 31,
+        "values": [
+          0.271,
+          0.2769,
+          0.2724,
+          0.2747,
+          0.2726,
+          0.269,
+          0.2713,
+          0.2721,
+          0.2748,
+          0.2792,
+          0.2697,
+          0.2737,
+          0.2742,
+          0.275,
+          0.2742,
+          0.2712,
+          0.2754,
+          0.2726,
+          0.275,
+          0.2723,
+          0.2738,
+          0.272,
+          0.2678,
+          0.2732,
+          0.2789,
+          0.2724,
+          0.2714,
+          0.2717,
+          0.2771,
+          0.2751,
+          0.269
+        ]
+      },
+      "baseline_params": {
+        "LEN": 4
+      },
+      "baseline_measured": 0.4395,
+      "baseline_stats": {
+        "median": 0.4395,
+        "mean": 0.44061612903225805,
+        "stdev": 0.004688076846226926,
+        "min": 0.4344,
+        "max": 0.4526,
+        "q1": 0.43735,
+        "q3": 0.4424,
+        "n": 31,
+        "values": [
+          0.4453,
+          0.4373,
+          0.4403,
+          0.4352,
+          0.4487,
+          0.4345,
+          0.4403,
+          0.4429,
+          0.4393,
+          0.4447,
+          0.4364,
+          0.4361,
+          0.4365,
+          0.4395,
+          0.4387,
+          0.4392,
+          0.4395,
+          0.4384,
+          0.4526,
+          0.4407,
+          0.4419,
+          0.4389,
+          0.4368,
+          0.4344,
+          0.4376,
+          0.4374,
+          0.4487,
+          0.4415,
+          0.44,
+          0.45,
+          0.4458
+        ]
+      },
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract float-inner-product\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'LEN': 4}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=5; stuck; remaining cost drivers: mul_nonconst=1, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (11.9s): pool of 1 (performance catalog has 9 rewrites, added narrow-accum:{'LEN': 4})\n  [PASS] S6 WinnerSelection (1.4s): winner narrow-accum:{'LEN': 4}: 0.273 \u00b1 0.003 vs baseline 0.440 \u00b1 0.005 ns_per_mac\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\innerprod\\out.c\n  log:\n    CEGIS try 1: {'LEN': 4} -> proved(11.9s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0010161000536754727,
+        "S2 TheoryLower": 0.0004369000671431422,
+        "S3 Baseline-Directed CEGIS": 7.00005330145359e-07,
+        "S4 BudgetNormalize": 6.00004568696022e-07,
+        "S5 GeneratePool": 11.886682000011206,
+        "S6 WinnerSelection": 1.3635797000024468,
+        "S7 Emit": 0.0005080000264570117
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    },
+    {
+      "id": "luma",
+      "contract": "cases/luma/contract.yaml",
+      "K": "unwind 6",
+      "S2_ok": true,
+      "S2_details": "tractable; kappa=2",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "luma-q15"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "luma-q15:{'NPX': 4}",
+          "params": {
+            "NPX": 4
+          },
+          "applied": [
+            "luma-q15"
+          ],
+          "measured": 0.5604,
+          "stats": {
+            "median": 0.5604,
+            "mean": 0.5648677419354838,
+            "stdev": 0.014487750851363463,
+            "min": 0.5497,
+            "max": 0.6251,
+            "q1": 0.5565,
+            "q3": 0.5679000000000001,
+            "n": 31,
+            "values": [
+              0.551,
+              0.5497,
+              0.5546,
+              0.5647,
+              0.5598,
+              0.5571,
+              0.5581,
+              0.5804,
+              0.5674,
+              0.5682,
+              0.5545,
+              0.6251,
+              0.5691,
+              0.5629,
+              0.5733,
+              0.5591,
+              0.5551,
+              0.586,
+              0.5585,
+              0.5605,
+              0.5658,
+              0.5538,
+              0.5675,
+              0.5527,
+              0.5559,
+              0.5604,
+              0.5598,
+              0.586,
+              0.5581,
+              0.5681,
+              0.5677
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.10941909998655319,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "luma-q15:{'NPX': 4}",
+      "winner_params": {
+        "NPX": 4
+      },
+      "winner_applied": [
+        "luma-q15"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.10941909998655319,
+          "reason": ""
+        }
+      ],
+      "winner_measured": 0.5604,
+      "winner_stats": {
+        "median": 0.5604,
+        "mean": 0.5648677419354838,
+        "stdev": 0.014487750851363463,
+        "min": 0.5497,
+        "max": 0.6251,
+        "q1": 0.5565,
+        "q3": 0.5679000000000001,
+        "n": 31,
+        "values": [
+          0.551,
+          0.5497,
+          0.5546,
+          0.5647,
+          0.5598,
+          0.5571,
+          0.5581,
+          0.5804,
+          0.5674,
+          0.5682,
+          0.5545,
+          0.6251,
+          0.5691,
+          0.5629,
+          0.5733,
+          0.5591,
+          0.5551,
+          0.586,
+          0.5585,
+          0.5605,
+          0.5658,
+          0.5538,
+          0.5675,
+          0.5527,
+          0.5559,
+          0.5604,
+          0.5598,
+          0.586,
+          0.5581,
+          0.5681,
+          0.5677
+        ]
+      },
+      "baseline_params": {
+        "NPX": 4
+      },
+      "baseline_measured": 0.84,
+      "baseline_stats": {
+        "median": 0.84,
+        "mean": 0.8424709677419354,
+        "stdev": 0.010675491980806227,
+        "min": 0.8286,
+        "max": 0.8821,
+        "q1": 0.83655,
+        "q3": 0.8447,
+        "n": 31,
+        "values": [
+          0.844,
+          0.8448,
+          0.8703,
+          0.836,
+          0.8446,
+          0.8453,
+          0.8821,
+          0.84,
+          0.8336,
+          0.8286,
+          0.8318,
+          0.8392,
+          0.8406,
+          0.8416,
+          0.8378,
+          0.8407,
+          0.8521,
+          0.8345,
+          0.8364,
+          0.8515,
+          0.8391,
+          0.8429,
+          0.8485,
+          0.832,
+          0.8396,
+          0.8405,
+          0.8367,
+          0.8377,
+          0.8482,
+          0.8398,
+          0.8361
+        ]
+      },
+      "marker_in_winner": true,
+      "as_if": "leaves as-if",
+      "pipeline": "contract bt601-luma\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'NPX': 4}\n  [PASS] S2 TheoryLower (0.0s): tractable; kappa=2\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.1s): pool of 1 (performance catalog has 9 rewrites, added luma-q15:{'NPX': 4})\n  [PASS] S6 WinnerSelection (0.8s): winner luma-q15:{'NPX': 4}: 0.560 \u00b1 0.014 vs baseline 0.840 \u00b1 0.011 ns_per_pixel\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\luma\\out.c\n  log:\n    CEGIS try 1: {'NPX': 4} -> proved(0.1s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0010463999351486564,
+        "S2 TheoryLower": 0.00017530005425214767,
+        "S3 Baseline-Directed CEGIS": 7.00005330145359e-07,
+        "S4 BudgetNormalize": 7.00005330145359e-07,
+        "S5 GeneratePool": 0.11304520000703633,
+        "S6 WinnerSelection": 0.8021211000159383,
+        "S7 Emit": 0.00047009997069835663
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": true,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    },
+    {
+      "id": "particles-fat",
+      "contract": "cases/particles_fat/contract.yaml",
+      "K": "unwind 6",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=11; stuck; remaining cost drivers: mul_nonconst=3, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "aos-to-soa"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "aos-to-soa:{'N': 4}",
+          "params": {
+            "N": 4
+          },
+          "applied": [
+            "aos-to-soa"
+          ],
+          "measured": 0.3461,
+          "stats": {
+            "median": 0.3461,
+            "mean": 0.3495677419354839,
+            "stdev": 0.011919546610414741,
+            "min": 0.3353,
+            "max": 0.381,
+            "q1": 0.34215,
+            "q3": 0.35275,
+            "n": 31,
+            "values": [
+              0.381,
+              0.3632,
+              0.3542,
+              0.3791,
+              0.3544,
+              0.3473,
+              0.3458,
+              0.3494,
+              0.3799,
+              0.3461,
+              0.3421,
+              0.342,
+              0.3513,
+              0.343,
+              0.3602,
+              0.3452,
+              0.3379,
+              0.3401,
+              0.3459,
+              0.3463,
+              0.3407,
+              0.3398,
+              0.3353,
+              0.3422,
+              0.3374,
+              0.3426,
+              0.3493,
+              0.346,
+              0.3462,
+              0.3482,
+              0.3545
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 0.6099382999818772,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": false,
+      "winner_name": "aos-to-soa:{'N': 4}",
+      "winner_params": {
+        "N": 4
+      },
+      "winner_applied": [
+        "aos-to-soa"
+      ],
+      "winner_V": [
+        {
+          "outcome": "proved",
+          "seconds": 0.6099382999818772,
+          "reason": ""
+        }
+      ],
+      "winner_measured": 0.3461,
+      "winner_stats": {
+        "median": 0.3461,
+        "mean": 0.3495677419354839,
+        "stdev": 0.011919546610414741,
+        "min": 0.3353,
+        "max": 0.381,
+        "q1": 0.34215,
+        "q3": 0.35275,
+        "n": 31,
+        "values": [
+          0.381,
+          0.3632,
+          0.3542,
+          0.3791,
+          0.3544,
+          0.3473,
+          0.3458,
+          0.3494,
+          0.3799,
+          0.3461,
+          0.3421,
+          0.342,
+          0.3513,
+          0.343,
+          0.3602,
+          0.3452,
+          0.3379,
+          0.3401,
+          0.3459,
+          0.3463,
+          0.3407,
+          0.3398,
+          0.3353,
+          0.3422,
+          0.3374,
+          0.3426,
+          0.3493,
+          0.346,
+          0.3462,
+          0.3482,
+          0.3545
+        ]
+      },
+      "baseline_params": {
+        "N": 4
+      },
+      "baseline_measured": 1.203,
+      "baseline_stats": {
+        "median": 1.203,
+        "mean": 1.217932258064516,
+        "stdev": 0.038821105832581776,
+        "min": 1.1778,
+        "max": 1.3226,
+        "q1": 1.1914500000000001,
+        "q3": 1.23565,
+        "n": 31,
+        "values": [
+          1.2969,
+          1.2425,
+          1.2247,
+          1.1919,
+          1.1942,
+          1.1961,
+          1.1878,
+          1.191,
+          1.203,
+          1.1924,
+          1.1832,
+          1.1783,
+          1.1778,
+          1.189,
+          1.2054,
+          1.215,
+          1.182,
+          1.2,
+          1.2831,
+          1.265,
+          1.2446,
+          1.2548,
+          1.209,
+          1.3226,
+          1.2288,
+          1.2108,
+          1.184,
+          1.2176,
+          1.2908,
+          1.1987,
+          1.1949
+        ]
+      },
+      "marker_in_winner": true,
+      "as_if": "representation",
+      "pipeline": "contract particle-fat-aos\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'N': 4}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=11; stuck; remaining cost drivers: mul_nonconst=3, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (0.6s): pool of 1 (performance catalog has 9 rewrites, added aos-to-soa:{'N': 4})\n  [PASS] S6 WinnerSelection (1.0s): winner aos-to-soa:{'N': 4}: 0.346 \u00b1 0.012 vs baseline 1.203 \u00b1 0.039 ns_per_update\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\particles-fat\\out.c\n  log:\n    CEGIS try 1: {'N': 4} -> proved(0.6s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0013359000440686941,
+        "S2 TheoryLower": 0.002166499965824187,
+        "S3 Baseline-Directed CEGIS": 8.00006091594696e-07,
+        "S4 BudgetNormalize": 6.00004568696022e-07,
+        "S5 GeneratePool": 0.6170017999829724,
+        "S6 WinnerSelection": 1.030562200001441,
+        "S7 Emit": 0.0005489999894052744
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    },
+    {
+      "id": "fir",
+      "contract": "cases/fir_block/contract.yaml",
+      "K": "unwind 12",
+      "S2_ok": false,
+      "S2_details": "stuck with no applicable rewrite; kappa=8; stuck; remaining cost drivers: mul_nonconst=2, loop=1",
+      "pool_n": 1,
+      "pool_applied": [
+        [
+          "align-loop-bound:BLOCK"
+        ]
+      ],
+      "pool": [
+        {
+          "name": "align-loop-bound:BLOCK:{'BLOCK': 8, 'TAPS': 2}",
+          "params": {
+            "BLOCK": 8,
+            "TAPS": 2
+          },
+          "applied": [
+            "align-loop-bound:BLOCK"
+          ],
+          "measured": 0.9267,
+          "stats": {
+            "median": 0.9267,
+            "mean": 0.9509741935483871,
+            "stdev": 0.0619861972148743,
+            "min": 0.9052,
+            "max": 1.2295,
+            "q1": 0.9148000000000001,
+            "q3": 0.96865,
+            "n": 31,
+            "values": [
+              0.9325,
+              0.9123,
+              0.945,
+              0.9132,
+              0.9254,
+              0.9267,
+              0.912,
+              0.9409,
+              0.9119,
+              0.9879,
+              0.9174,
+              0.988,
+              0.937,
+              0.9213,
+              0.9204,
+              0.9205,
+              0.9159,
+              0.916,
+              0.9116,
+              1.0089,
+              0.9137,
+              1.02,
+              1.2295,
+              0.9361,
+              1.0023,
+              0.9788,
+              1.0004,
+              0.9576,
+              0.9133,
+              0.9585,
+              0.9052
+            ]
+          },
+          "V": [
+            {
+              "outcome": "proved",
+              "seconds": 6.724718900048174,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "admitted": true,
+      "emit_is_baseline": true,
+      "winner_name": null,
+      "winner_params": {},
+      "winner_applied": [],
+      "winner_V": [],
+      "winner_measured": null,
+      "winner_stats": null,
+      "baseline_params": {
+        "BLOCK": 5,
+        "TAPS": 2
+      },
+      "baseline_measured": 0.4596,
+      "baseline_stats": {
+        "median": 0.4596,
+        "mean": 0.4646,
+        "stdev": 0.016267902958484442,
+        "min": 0.4559,
+        "max": 0.5419,
+        "q1": 0.4565,
+        "q3": 0.4648,
+        "n": 31,
+        "values": [
+          0.4601,
+          0.4783,
+          0.4566,
+          0.4565,
+          0.4649,
+          0.4699,
+          0.5419,
+          0.489,
+          0.4712,
+          0.4561,
+          0.4565,
+          0.4744,
+          0.4676,
+          0.4564,
+          0.4647,
+          0.4567,
+          0.4561,
+          0.4564,
+          0.4593,
+          0.4588,
+          0.4588,
+          0.4602,
+          0.4613,
+          0.458,
+          0.4561,
+          0.4645,
+          0.4596,
+          0.4565,
+          0.4601,
+          0.4602,
+          0.4559
+        ]
+      },
+      "marker_in_winner": false,
+      "as_if": "fallback P1",
+      "pipeline": "contract cmsis-fir-block\n  [PASS] S1 CheckRealiz (0.0s): parameter constraints satisfiable; baseline parameters {'BLOCK': 5, 'TAPS': 2}\n  [FAIL] S2 TheoryLower (0.0s): stuck with no applicable rewrite; kappa=8; stuck; remaining cost drivers: mul_nonconst=2, loop=1\n  [FAIL] S3 Baseline-Directed CEGIS (0.0s): no sketch yielded a verified candidate\n  [PASS] S4 BudgetNormalize (0.0s): no budget\n  [PASS] S5 GeneratePool (6.7s): pool of 1 (performance catalog has 9 rewrites, added align-loop-bound:BLOCK:{'BLOCK': 8, 'TAPS': 2})\n  [PASS] S6 WinnerSelection (0.3s): baseline kept (0.460 \u00b1 0.016)\n  [PASS] S7 Emit (0.0s): wrote experiments/eval/_work\\horse\\fir\\out.c\n  log:\n    CEGIS try 1: {'BLOCK': 8, 'TAPS': 2} -> proved(6.7s)",
+      "seconds": {
+        "S1 CheckRealiz": 0.0014229000080376863,
+        "S2 TheoryLower": 0.0008894000202417374,
+        "S3 Baseline-Directed CEGIS": 6.00004568696022e-07,
+        "S4 BudgetNormalize": 5.998881533741951e-07,
+        "S5 GeneratePool": 6.729127200087532,
+        "S6 WinnerSelection": 0.3149096999550238,
+        "S7 Emit": 0.0005282999482005835
+      },
+      "steps_ok": {
+        "S1 CheckRealiz": true,
+        "S2 TheoryLower": false,
+        "S3 Baseline-Directed CEGIS": false,
+        "S4 BudgetNormalize": true,
+        "S5 GeneratePool": true,
+        "S6 WinnerSelection": true,
+        "S7 Emit": true
+      },
+      "P1_V": null
+    }
+  ]
+}

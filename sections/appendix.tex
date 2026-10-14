@@ -1,0 +1,464 @@
+\section{Proofs}
+\label{app:proofs}
+
+Throughout, ``result'' means the observable part of
+\(\llbracket P \rrbracket(\sigma)\), and \(\mathit{Acc}_\theta(\sigma)\) is
+the set of observable results that \(\mathit{Post}_\theta\) accepts on
+\(\sigma\).
+
+\paragraph{Proposition~\ref{prop:refine} (As-If Programs Remain Legal).}
+If \(P \models \Phi_{\text{func}}\), \(P' \approx P\), and
+\(\theta_{P'} = \theta_P\), then \(P' \models \Phi_{\text{func}}\).
+\begin{proof}
+Suppose \(P' \not\models \Phi_{\text{func}}\).
+Then either \(\theta_{P'} \notin \mathcal{I}\), or some
+\(\sigma \in \mathit{Pre}\) is a non-terminating, undefined, or unacceptable
+run of \(P'\). The first case is impossible because
+\(\theta_{P'} = \theta_P \in \mathcal{I}\). In the second case,
+\(P' \approx P\) gives the same observable result for \(P\) on \(\sigma\),
+so \(P\) also violates the contract, a contradiction.
+\end{proof}
+
+\paragraph{Proposition~\ref{prop:expansion} (Legal Set Expands Exactly on Observable Slack).}
+Assume local patching, and that each \(\mathit{Post}_\theta\) with
+\(\theta \in \mathcal{I}\) is realized by some program. Let
+\(P \models \Phi_{\text{func}}\). Then
+\(\mathrm{Sat}(\Phi_{\text{func}})\) contains a program that is not
+observationally equivalent to \(P\) iff the contract has input, output, or
+logical-parameter slack, counting only results some program produces.
+Unexposed slack is not in that list: it need not change those results.
+\begin{proof}
+Assume also that all results below are produced by some program.
+Let \(o_P(\sigma)\) be \(P\)'s result on \(\sigma\).
+
+(\(\Leftarrow\))
+\emph{Input slack.} Let \(\sigma_0 \notin \mathit{Pre}\) and let \(o\) be a
+producible result different from \(o_P(\sigma_0)\). Patch \(P\) at
+\(\sigma_0\). The patch agrees with \(P\) on \(\mathit{Pre}\), so it
+satisfies the contract, and differs from \(P\) on \(\sigma_0\).
+
+\emph{Output slack.} Let \(\sigma_0 \in \mathit{Pre}\) and
+\(\theta = \theta_P\) with two accepted results, one of them \(o \neq
+o_P(\sigma_0)\). (If the slack is only at another parameter, it is the
+logical-parameter case.) Patch \(P\) at \(\sigma_0\) to produce \(o\).
+
+\emph{Logical-parameter slack.} Let \(\sigma_0 \in \mathit{Pre}\) and
+\(\theta_1, \theta_2 \in \mathcal{I}\) with
+\(\mathit{Acc}_{\theta_1}(\sigma_0) \neq \mathit{Acc}_{\theta_2}(\sigma_0)\).
+Both sets are nonempty. Some accepted result \(o\) at one of those
+parameters differs from \(o_P(\sigma_0)\). Start from a program for that
+parameter and patch it at \(\sigma_0\).
+
+(\(\Rightarrow\)) If there is no such slack, then \(\mathit{Pre} = \Sigma\),
+each \(\mathit{Acc}_\theta(\sigma)\) has at most one producible element, and
+those elements coincide for all \(\theta \in \mathcal{I}\). That element is
+\(o_P(\sigma)\). Any legal \(P'\) must produce it everywhere, so
+\(P' \approx P\).
+\end{proof}
+
+Unexposed slack is omitted because it need not change observable API results.
+
+\paragraph{Lemma~\ref{lem:lowering} (Lowering Preserves a Proved Contract).}
+If \(P^* \models \Phi_{\text{func}}\) (respectively \(\models_K\)), then
+\(\mathcal{L}_{\text{Target}}(P^*) \models \Phi_{\text{func}}\)
+(respectively \(\models_K\)).
+\begin{proof}
+Let \(B = \mathcal{L}_{\text{Target}}(P^*)\). Parameters of \(B\) are those
+of the source given to the backend. If \(P^*\) satisfies \(\Phi_{\text{func}}\)
+(or \(\models_K\)) then it has no undefined behavior on the covered inputs
+(or traces), terminates with an accepted result, and the compiler
+correctness assumption copies that result to \(B\).
+Proposition~\ref{prop:refine} is the unbounded case.
+\end{proof}
+
+\paragraph{Theorem~\ref{thm:restricted} (Soundness of a Restricted Intent Compiler).}
+Let \(V\) be sound for \(\models\) or for \(\models_K\), and let the compiler
+emit source \(P^*\) and binary
+\(\mathrm{Bin}^* = \mathcal{L}_{\text{Target}}(P^*)\).
+\begin{enumerate}
+  \item If \(P^* \neq P_1\), then \(P^*\) is in \(\mathrm{Gen}(P_1, R, D)\),
+  \(V\) proved it, and it passed \(\mathcal{B}\). Hence
+  \(P^* \models \Phi_{\text{func}}\) or \(P^* \models_K \Phi_{\text{func}}\),
+  matching \(V\), and the same judgment holds of \(\mathrm{Bin}^*\) by
+  Lemma~\ref{lem:lowering}.
+  \item The measured cost of \(\mathrm{Bin}^*\) is at most that of
+  \(\mathcal{L}_{\text{Target}}(P_1)\), when measurement runs.
+  \item If \(P_1 \models \Phi_{\text{func}}\) (or \(\models_K\)), then
+  \(\mathrm{Bin}^*\) satisfies the same judgment in every case.
+\end{enumerate}
+\begin{proof}
+Winner selection (Algorithm~\ref{alg:winner}) returns \(P_1\) or a member of \(\mathcal{A}\). If
+\(P^* \neq P_1\), then \(P^* \in \mathcal{A}\), so \(P^* \in \mathrm{Gen}\),
+\(V\) answered \(\mathsf{proved}\), and \(\mathcal{B}\) passed.
+Soundness of \(V\) gives \(\models\) or \(\models_K\).
+Lemma~\ref{lem:lowering} transfers the judgment to the binary. Measured
+cost is minimized over a set containing
+\(\mathcal{L}_{\text{Target}}(P_1)\). If \(P^* = P_1\) and \(P_1\) already
+satisfies the judgment, apply Lemma~\ref{lem:lowering} to \(P_1\).
+\end{proof}
+
+\section{Pipeline Algorithms}
+\label{app:algorithms}
+
+This appendix gives each stage of \textsc{IntentCompile} as an algorithm:
+inputs, outputs, the promises that algorithm makes, and a proof of those
+promises. Every stage claims termination, relative to its oracles returning
+(the solver for \(\mathcal{I}\), \(V\), the checker for \(\mathcal{B}\),
+lowering, and measurement). Parameters such as the TheoryLower score, the
+CEGIS distance, the attempt cap, the checker for \(\mathcal{B}\), and the
+rewrite catalogs are inputs of the algorithms.
+Section~\ref{sec:implementation} instantiates them. Hole domains are finite. \(V\) returns
+\(\mathsf{proved}\), a counterexample, or \(\mathsf{unknown}\), and respects
+its time budget. A rewrite in a catalog has a syntactic applicability
+condition and optional side constraints on holes. Nothing below claims that
+\(\mathrm{Sat}(\Phi_{\text{func}})\) is searchable, that the catalogs are
+complete, or that \(V\) decides every query.
+
+\subsection{\textsc{CheckRealiz}}
+
+\begin{algo}[\textsc{CheckRealiz}]
+\label{alg:checkrealiz}
+Input: \(\Phi_{\text{func}} = \langle \mathit{Pre}, \mathit{Post},
+\mathcal{I}\rangle\) and a solver for \(\mathcal{I}\) that answers
+satisfiable, unsatisfiable, or \(\mathsf{unknown}\). A time budget on that
+solver, when present, is mapped to \(\mathsf{unknown}\).
+Output: \(\mathsf{continue}\), or a stop
+(\(\mathsf{vacuous}\), \(\mathsf{unsat}\) with a core, or
+\(\mathsf{unknown}\)).
+\begin{enumerate}
+  \item If \(\mathit{Pre} = \emptyset\), report \(\mathsf{vacuous}\) and
+  stop.
+  \item Ask the solver whether \(\mathcal{I}\) is satisfiable.
+  \item If the answer is unsatisfiable, report \(\mathsf{unsat}\) with the
+  solver's unsatisfiable core and stop.
+  \item If the answer is \(\mathsf{unknown}\), stop.
+  \item If the answer is satisfiable, report \(\mathsf{continue}\).
+\end{enumerate}
+\end{algo}
+
+\begin{lemma}[\textsc{CheckRealiz}]
+\label{lem:checkrealiz}
+Assume the solver for \(\mathcal{I}\) is sound.
+\begin{enumerate}
+  \item \emph{Termination.} If the solver for \(\mathcal{I}\) returns in
+  finite time, so does the algorithm. A timeout is \(\mathsf{unknown}\) and
+  is a return.
+  \item \emph{No candidate.} The algorithm emits no program.
+  \item \emph{Vacuous stop.} If it reports \(\mathsf{vacuous}\), then
+  \(\mathit{Pre} = \emptyset\), so every program satisfies
+  \(\Phi_{\text{func}}\) and the contract states no intent.
+  \item \emph{Unsat stop.} If it reports \(\mathsf{unsat}\), then
+  \(\mathcal{I}\) is empty, so no program satisfies
+  \(\Phi_{\text{func}}\).
+  \item \emph{Unknown stop.} An \(\mathsf{unknown}\) answer is a stop, not a
+  proof that \(\mathcal{I}\) is inhabited or empty.
+  \item \emph{Continue.} A \(\mathsf{continue}\) result is only that
+  \(\mathcal{I}\) has a model. It is not a candidate, and it does not decide
+  whether \(\mathit{Post}\) is realizable on \(\mathit{Pre}\).
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+Steps 1 and 3--5 are local. The only query is step 2. If the solver
+returns satisfiable, unsatisfiable, or \(\mathsf{unknown}\), one of those
+steps returns, which is (1). The algorithm has no step that constructs or
+admits a program, so (2) holds. Step 1 returns \(\mathsf{vacuous}\) exactly
+when \(\mathit{Pre} = \emptyset\). Satisfaction of \(\Phi_{\text{func}}\)
+quantifies over \(\mathit{Pre}\), so an empty precondition is true of every
+program, which is (3). Step 3 returns \(\mathsf{unsat}\) only on a sound
+unsat answer, which means \(\mathcal{I}\) has no valuation. A program that
+satisfies \(\Phi_{\text{func}}\) must have \(\theta_P \in \mathcal{I}\), so
+no such program exists, which is (4). Step 4 returns on
+\(\mathsf{unknown}\) without a model or a core, which is (5). The query in
+step 2 mentions \(\mathcal{I}\) only. A model of \(\mathcal{I}\) does not
+produce a program and does not prove that every \(\sigma \in \mathit{Pre}\)
+has an accepted result under \(\mathit{Post}\), which is (6).
+\end{proof}
+
+The stronger query \(\forall \sigma \in \mathit{Pre}.\ \exists o.\
+(\sigma, o) \in \mathit{Post}_\theta\) is not this stage. An unsatisfiable
+harness is discovered later, when no candidate is proved. Termination is
+relative to the solver: the stage does not decide an arbitrary theory of
+\(\mathcal{I}\), and a solver with no budget may diverge.
+
+\subsection{\textsc{TheoryLower}}
+
+Let \(\mathit{score}\) map sketches to \(\delta\cdot\mathbb{N}\) for some
+granularity \(\delta > 0\), and let \(\tau\) be a threshold at which
+rewriting stops. Both are inputs. The intended reading is a weighted count
+of constructs outside a chosen cheap set for the source language and
+\(V\), so descent aims at that set. Any score with those values for which
+every applied rewrite strictly decreases the score makes the lemma hold.
+\textsc{IntC}'s score is the weighted feature count of
+Section~\ref{sec:implementation}. \(\mathit{score}(S) \le \tau\) does not
+imply that \(V\) decides \(S\).
+
+\begin{algo}[\textsc{TheoryLower}]
+\label{alg:theorylower}
+Input: baseline \(P_1\), catalog \(R\), \(\mathit{score}\), and
+threshold \(\tau\).
+Output: a sketch \(S\) tagged \(\mathsf{below\text{-}threshold}\) or
+\(\mathsf{stuck}\), or no sketch.
+\begin{enumerate}
+  \item Set \(S \gets P_1\). Rewrites, not this step, introduce holes.
+  \item If \(\mathit{score}(S) \le \tau\), return no sketch, tagged
+  \(\mathsf{below\text{-}threshold}\).
+  \item Among pairs of a rewrite \(r \in R\) and a site of \(S\) where
+  \(r\) applies, choose one that minimizes \(\mathit{score}(r(S))\). If no
+  pair gives a strict decrease: if a rewrite has already been applied,
+  return \((S, \mathsf{stuck})\); otherwise return no sketch, tagged
+  \(\mathsf{stuck}\).
+  \item Set \(S \gets r(S)\). If \(\mathit{score}(S) \le \tau\), return
+  \((S, \mathsf{below\text{-}threshold})\). Otherwise go to step 3.
+\end{enumerate}
+\end{algo}
+
+\begin{lemma}[\textsc{TheoryLower}]
+\label{lem:theorylower}
+\begin{enumerate}
+  \item \emph{Termination.} The algorithm returns after at most
+  \(\mathit{score}(P_1)/\delta\) rewrites.
+  \item \emph{Catalog.} Every rewrite it applies is from \(R\), at a site
+  that matches that rewrite. Holes come from those rewrites.
+  \item \emph{Exits.} CEGIS receives a sketch only if a rewrite applied.
+  That sketch has \(\mathit{score} \le \tau\), or no remaining rewrite in
+  \(R\) lowers the score. If no rewrite applied, there is no TheoryLower
+  seed.
+  \item \emph{Unverified.} No returned sketch is submitted to \(V\) at this
+  stage.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+Each applied rewrite lowers \(\mathit{score}\) by at least \(\delta\), and
+the score is nonnegative, so that can happen at most
+\(\mathit{score}(P_1)/\delta\) times, which is (1). Step 3 selects from
+\(R\) at matching sites, and step 1 does not punch holes, which is (2).
+Step 2 returns no sketch. Step 3 returns a sketch only if one was already
+applied, or no sketch. Step 4 returns a rewritten sketch, which is (3).
+No step calls \(V\), which is (4).
+\end{proof}
+
+The stage makes no semantic claim. The sketch may violate the contract for
+every hole value, and later stages decide which fillings survive. The loop
+is greedy: a rewrite that first raises the score and enables a larger drop
+later is never taken. A \(\mathsf{stuck}\) result does not abort
+\textsc{GeneratePool}, which starts from \(P_1\).
+
+\subsection{\textsc{Baseline-Directed CEGIS}}
+
+Let \(S[h]\) be a sketch with holes ranging over a finite domain \(D\), and
+let \(\mathit{dist}\) be a distance on \(D\). Closeness is relative to
+\(\mathit{dist}\). \textsc{IntC} minimizes distance of baseline holes to
+\(\theta_{P_1}\) and extra holes subject to the side constraints
+(Section~\ref{sec:implementation}).
+
+\begin{algo}[\textsc{Baseline-Directed CEGIS}]
+\label{alg:cegis}
+Input: sketch \(S\), domain \(D\), side constraints, \(\mathcal{I}\),
+baseline parameters \(\theta_{P_1}\), verifier \(V\) with budget \(t\), and
+a finite attempt cap \(N\).
+Output: a filled program \(S[h]\), or \(\mathsf{fail}\).
+\begin{enumerate}
+  \item Set \(R_{\mathrm{ex}} \gets \emptyset\) and \(n \gets 0\).
+  \item If \(n = N\), return \(\mathsf{fail}\).
+  \item Find \(h \in D \setminus R_{\mathrm{ex}}\) that meets the side
+  constraints, gives \(\theta_{S[h]} \in \mathcal{I}\), and minimizes
+  \(\mathit{dist}(h, \theta_{P_1})\). If none exists, return
+  \(\mathsf{fail}\).
+  \item Run \(V(S[h], \Phi_{\text{func}}, t)\).
+  \item If the answer is \(\mathsf{proved}\), return \(S[h]\).
+  \item If the answer is a counterexample, add \(h\) to
+  \(R_{\mathrm{ex}}\). Do not add the failing input as a constraint on
+  later proposals. Set \(n \gets n+1\) and go to step 2.
+  \item If the answer is \(\mathsf{unknown}\), return \(\mathsf{fail}\).
+\end{enumerate}
+\end{algo}
+
+\paragraph{Theorem~\ref{thm:cegis} (Properties of Baseline-Directed CEGIS).}
+Let \(S[h]\) range over a finite hole domain \(D\), and let \(N\) be the
+attempt cap (\(N = |D|\) if there is no cap).
+\begin{enumerate}
+  \item If CEGIS returns \(S[h]\), then \(V\) proved \(S[h]\).
+  \item \emph{Termination.} If \(V\) returns on each query, CEGIS returns
+  after at most \(\min(N, |D|)\) iterations. Step 3 searches a finite set,
+  so it returns.
+  \item If some \(h^\circ \in D\) makes \(S[h^\circ]\) satisfy the contract
+  (or \(\models_K\)), \(V\) never answers \(\mathsf{unknown}\), and there is
+  no attempt cap, then CEGIS returns a satisfying assignment closest to
+  \(\theta_{P_1}\).
+\end{enumerate}
+\begin{proof}
+(1) The only success return is step 5, which requires
+\(\mathsf{proved}\).
+
+(2) \(V\) is assumed to return (\(\mathsf{proved}\), a counterexample, or
+\(\mathsf{unknown}\)) because it respects \(t\). Each unsuccessful
+iteration that does not fail on \(\mathsf{unknown}\) adds one \(h\) to
+\(R_{\mathrm{ex}}\) and never retries it. The loop also stops when
+\(n = N\). Together that is at most \(\min(N, |D|)\) iterations. Step 3
+enumerates a finite remainder of \(D\).
+
+(3) Let \(H^\circ = \{h' \in D \mid S[h'] \models \Phi_{\text{func}}\}\)
+(or \(\models_K\)), nonempty by assumption. Soundness of \(V\) keeps every
+member of \(H^\circ\) out of \(R_{\mathrm{ex}}\), because only a
+counterexample excludes a valuation. Step 3 therefore always sees a
+nonempty feasible set, so it does not fail. Since \(V\) never answers
+\(\mathsf{unknown}\) and there is no cap, (2) ends the run on
+\(\mathsf{proved}\). The returned \(h\) is feasible for step 3 at that
+iteration, hence minimizes \(\mathit{dist}(\cdot, \theta_{P_1})\) over a
+set that still contains \(H^\circ\). An attempt cap preserves (1) and (2)
+and may drop (3).
+\end{proof}
+
+The bound \(|D|\) is a worst case. Side constraints shrink the search.
+The guarantee covers only the holes of the given sketch. If no filling of
+that sketch satisfies the contract, CEGIS fails, and a different structure
+is a rewrite, not a closer \(h\).
+
+\subsection{\textsc{BudgetNormalize}}
+
+\begin{algo}[\textsc{BudgetNormalize}]
+\label{alg:budgetnormalize}
+Input: a finite set of CEGIS seeds, baseline \(P_1\), and a terminating
+checker for \(\mathcal{B}\).
+Output: a (possibly empty) subset of the seeds, and \(P_1\) unmarked as a
+seed. \textsc{GeneratePool} is not skipped.
+\begin{enumerate}
+  \item Apply the checker for \(\mathcal{B}\) to each seed and to
+  \(P_1\).
+  \item Keep those seeds for which the checker passes. Drop the rest.
+  \item If none remain, record that the seed set is empty.
+  \item Return the kept set. Do not disable \textsc{GeneratePool}.
+\end{enumerate}
+\end{algo}
+
+\begin{lemma}[\textsc{BudgetNormalize}]
+\label{lem:budgetnormalize}
+\begin{enumerate}
+  \item \emph{Termination.} If the checker terminates on each of finitely
+  many programs, so does the algorithm.
+  \item \emph{Filter.} It adds no program.
+  \item \emph{Kept seeds.} Every kept seed still carries whatever \(V\)
+  proof it had, and passes \(\mathcal{B}\).
+  \item \emph{Baseline.} The checker is applied to \(P_1\), but \(P_1\) is
+  never added to the kept seeds, so a miss does not remove it from
+  \eqref{eq:winner}.
+  \item \emph{Empty seeds.} An empty kept set does not skip
+  \textsc{GeneratePool}.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+One checker run per seed and one for \(P_1\) is finite if each run is,
+which is (1). The algorithm only retains or drops members of its input,
+which is (2). A kept seed is a subset of the input, so a prior
+\(\mathsf{proved}\) answer remains, and step 2 is exactly the checker for
+\(\mathcal{B}\), which is (3). Step 1 runs the checker on \(P_1\) and
+step 2 never adds it to the kept set, which is (4). Step 4 returns after recording
+emptiness and does not disable the next stage, which is (5).
+\end{proof}
+
+The stage does not repair a seed that misses \(\mathcal{B}\). A later
+rewrite in \textsc{GeneratePool} may still produce a different program that
+fits.
+
+\subsection{\textsc{GeneratePool}}
+
+Let \(R_{\mathrm{pool}}\) be a finite catalog of representation rewrites,
+disjoint in purpose from the TheoryLower catalog though both are subsets of
+the generator's \(R\).
+
+\begin{algo}[\textsc{GeneratePool}]
+\label{alg:generatepool}
+Input: baseline \(P_1\), catalog \(R_{\mathrm{pool}}\), any seeds that
+survived \textsc{BudgetNormalize}, verifier \(V\), and the checker for
+\(\mathcal{B}\).
+Output: a finite set \(\mathcal{C}\) of programs.
+\begin{enumerate}
+  \item Set \(\mathcal{C}\) to the surviving seeds (empty if none).
+  \item For each rewrite \(r \in R_{\mathrm{pool}}\) that applies to
+  \(P_1\), form the sketch \(r(P_1)\), run
+  Algorithm~\ref{alg:cegis} on it, and if CEGIS returns a program that
+  \(V\) proved and that passes \(\mathcal{B}\), add that program to
+  \(\mathcal{C}\).
+  \item Return \(\mathcal{C}\). Do not rank by \(\mathcal{O}\) or by an
+  estimated cost.
+\end{enumerate}
+\end{algo}
+
+\begin{lemma}[\textsc{GeneratePool}]
+\label{lem:generatepool}
+\begin{enumerate}
+  \item \emph{Termination.} The algorithm terminates if each CEGIS run
+  does and the checker for \(\mathcal{B}\) returns on each tried program.
+  \item \emph{Starts from \(P_1\).} Step 2 runs even when the seed set is
+  empty, and even when TheoryLower returned \(\mathsf{stuck}\).
+  \item \emph{Admission.} Every program in the returned \(\mathcal{C}\)
+  is in \(\mathcal{A}\). Surviving seeds are already in \(\mathcal{A}\).
+  \item \emph{No ranking.} The algorithm does not consult
+  \(\mathcal{O}\).
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+\(R_{\mathrm{pool}}\) is finite. Each CEGIS run terminates by
+Theorem~\ref{thm:cegis}(2). Each budget check is one run of a terminating
+checker, which is (1). Step 2
+iterates that catalog from \(P_1\) with no guard on the seed set or on
+TheoryLower's tag, which is (2). A program added in step 2 was obtained
+from \(P_1\) by a rewrite from the catalog, filled by CEGIS, proved by
+\(V\), and passed \(\mathcal{B}\), hence lies in \(\mathcal{A}\). Surviving
+seeds were proved by an earlier CEGIS run and passed
+\textsc{BudgetNormalize}, which is (3). Step 3 forbids ranking, and no
+other step reads \(\mathcal{O}\), which is (4).
+\end{proof}
+
+The forward pass can miss a combination that pays only after a later
+rewrite. Exploring sequences of rewrites would find those combinations at
+a cost exponential in sequence length. Ranking remains
+\eqref{eq:winner}.
+
+\subsection{Winner Selection}
+
+\begin{algo}[Winner Selection]
+\label{alg:winner}
+Input: \(P_1\), the set \(\mathcal{C}\) from
+Algorithm~\ref{alg:generatepool}, backend
+\(\mathcal{L}_{\text{Target}}\), and objective \(\mathcal{O}\).
+Output: source \(P^*\) and binary
+\(\mathrm{Bin}^* = \mathcal{L}_{\text{Target}}(P^*)\).
+\begin{enumerate}
+  \item Let \(\mathcal{A}\) be \(\mathcal{C}\) (every member already
+  proved and inside \(\mathcal{B}\)).
+  \item If the contract names no \(\mathcal{O}\), return the first member
+  of \(\mathcal{A}\), or \(P_1\) if \(\mathcal{A}\) is empty.
+  \item Lower \(P_1\) and every member of \(\mathcal{A}\) with
+  \(\mathcal{L}_{\text{Target}}\).
+  \item Measure each binary on the named workload and hardware, and
+  return the source whose binary minimizes \(\mathcal{O}\), preferring
+  \(P_1\) on ties, as in~\eqref{eq:winner}. If \(\mathcal{A}\) is empty,
+  return \(P_1\).
+\end{enumerate}
+\end{algo}
+
+\begin{lemma}[Winner Selection]
+\label{lem:winner}
+\begin{enumerate}
+  \item \emph{Termination.} If lowering and measurement return on each of
+  finitely many programs, so does the algorithm. If there is no
+  \(\mathcal{O}\), there is no measurement loop.
+  \item It returns \(P_1\) or a member of \(\mathcal{A}\).
+  \item Measurement is not admission: a program not proved by \(V\) is not
+  ranked. With no \(\mathcal{O}\), the first admitted program is emitted.
+\end{enumerate}
+The remaining claims are Theorem~\ref{thm:restricted}.
+\end{lemma}
+\begin{proof}
+\(\mathcal{A}\) is finite by Lemma~\ref{lem:generatepool}. With no
+\(\mathcal{O}\), step 2 returns immediately, which is (1). Otherwise one
+lowering and one measurement per member of
+\(\mathcal{A} \cup \{P_1\}\) is finite if each call returns, which is (1).
+The \(\arg\min\) set is
+\(\{\mathcal{L}_{\text{Target}}(P) \mid P \in \mathcal{A} \cup \{P_1\}\}\),
+or \(\{P_1\}\) when \(\mathcal{A}\) is empty, or the first of
+\(\mathcal{A}\) when there is no \(\mathcal{O}\), so the returned source is
+\(P_1\) or a member of \(\mathcal{A}\), which is (2). Steps 2 and 4 rank
+only admitted programs, which is (3).
+\end{proof}

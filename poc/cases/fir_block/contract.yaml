@@ -1,0 +1,30 @@
+# Block FIR — CMSIS remainder-loop case, integer
+#
+# Why this contract: audio/DSP blocks are "at least this many samples." Rounding
+# the trip count up to a multiple of the SIMD/unroll stride (4) is the usual
+# way to drop a scalar remainder loop. Extra outputs must still be the
+# convolution of the samples the harness provided (Post is in terms of BLOCK).
+#
+# Assumptions: 2 taps, BLOCK >= 5, small integers, no float, no NEON.
+# Upper bound is a search box, not the intent. Side constraint BLOCK % 4 == 0.
+# Objective ranks one filter() call. Rounding BLOCK 5→8 is extra trips.
+name: cmsis-fir-block
+baseline: baseline.c
+parameters:
+  - name: BLOCK
+    bits: 32
+    constraints: ["BLOCK >= 5", "BLOCK <= 64"]
+  - name: TAPS
+    bits: 32
+    constraints: ["TAPS >= 2", "TAPS <= 2"]
+harnesses:
+  - file: harness.c
+    entry: harness
+    unwind: 12
+    note: y[i] equals x[i]*h[0]+x[i+1]*h[1] for i in 0..BLOCK-1.
+budget: {}
+objective:
+  metric: ns_per_block
+  bench: bench.c
+  trials: 31
+verify_timeout_s: 90

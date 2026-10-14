@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "when": "2026-10-13T21:51:33.160622+00:00",
+    "machine": "see paper \u00a77"
+  },
+  "rows": [
+    {
+      "id": "contract-admits-mask",
+      "setting": "FIFO harness on mask, CAPACITY 1024, K=4",
+      "result": "proved/0.6s",
+      "outcome": "proved",
+      "seconds": 0.5978692999342456
+    },
+    {
+      "id": "bound-hides-bug",
+      "setting": "& 999 at capacity 1000",
+      "result": "K=4 proved/0.7s; K=10 counterexample/17.3s",
+      "outcome": "counterexample",
+      "seconds": 17.294804699951783,
+      "weak": {
+        "outcome": "proved",
+        "seconds": 0.6700989999808371
+      }
+    },
+    {
+      "id": "underspec-stack",
+      "setting": "LIFO stack vs occupancy-only Post vs FIFO Post",
+      "result": "capacity-only proved/0.5s; FIFO counterexample/0.4s",
+      "capacity_only": {
+        "outcome": "proved",
+        "seconds": 0.4702538999263197
+      },
+      "fifo": {
+        "outcome": "counterexample",
+        "seconds": 0.40601390006486326
+      }
+    },
+    {
+      "id": "budget-drops-mask",
+      "setting": "static_memory_bytes 8016 on the one-parameter ring",
+      "result": "emit P1",
+      "winner": null,
+      "S4": "baseline 8016 B; pow2-mask@406+pow2-mask@554:{'CAPACITY': 1024}: 8208 B > 8016 B; baseline fits; candidate dropped (emit will keep baseline)",
+      "emit_baseline": true
+    }
+  ],
+  "asif": {
+    "cl_rc": 0,
+    "cl_err": "asif_slot.c\n",
+    "has_reciprocal_mul": true,
+    "has_and_1023": true,
+    "slot_1000_ops": 10,
+    "clang": "clang not on PATH",
+    "listing": "experiments/eval/asif_slot.asm"
+  },
+  "inrange_listing": {
+    "cl_rc": 0,
+    "cl_err": "main.c\n",
+    "has_sqrtss": true,
+    "clang": "clang not on PATH",
+    "clang_has_sqrtss": null,
+    "listing": "experiments/eval/inrange_baseline.asm"
+  }
+}

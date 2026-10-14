@@ -1,0 +1,110 @@
+\section{Discussion and Future Work}
+\label{sec:discussion}
+
+\paragraph{Writing \(\Phi\).}
+Decoupling search from \(P_1\) moves the specification burden onto the
+developer. That cost has limited adoption of contract-based tools.
+A contract inferred from the baseline tends to freeze incidental choices,
+such as a capacity of exactly 1000, and removes the slack the problem
+depends on. Contracts have to come from intent, not from the code.
+Translating a goal-oriented requirements model into \(\mathit{Pre}\),
+\(\mathit{Post}\), and \(\mathcal{I}\) is future work. One route is a
+KAOS refinement of a goal tree down to atomic requirements in a formal
+specification language~\cite{vanlamsweerde2001gore}.
+
+\paragraph{Under-Specification.}
+The legal set is the slack in \(\Phi_{\text{func}}\), including slack the
+developer did not intend. A FIFO ring whose contract omits order admits a
+faster queue that reorders packets, and \(V\) will prove it. Checking a
+proposed contract against the baseline catches contracts that are too
+strong, not contracts that are too weak~\cite{misu2026specharness}. A missing
+requirement is a proved program the developer did not want. When a
+deployment or a rejected candidate surfaces a gap, that requirement
+should become a contract clause that later compilations re-check, so the
+same regression cannot return unless the requirements change. Completing
+\(\Phi\) that way is the developer's cycle around the compiler, not a
+pass of Section~\ref{sec:compiler}. The same holds for a cost that is
+missing from \(\mathcal{B}\) or \(\mathcal{O}\): concurrent false sharing
+on a padded ring cannot reject a candidate until it is named. Closing
+gaps permanently is the central open problem for intent compilation.
+
+\paragraph{Temporarily Relaxing Constraints.}
+Loosening \(\mathit{Pre}\) or \(\mathit{Post}\) enlarges
+\(\mathrm{Sat}(\Phi_{\text{func}})\), so the search can admit a program the
+tight contract would reject. Putting those clauses back makes that program
+illegal, and \(V\) has to run again. Loosening \(\mathcal{B}\) does not
+change legality: a candidate admitted under a looser memory ceiling can
+still satisfy \(\Phi_{\text{func}}\) after the tight ceiling is restored,
+and no observable test fails. The compiler also bounds how much of
+\(\mathrm{Gen}\) it explores and how long \(V\) may run; loosening those
+changes which candidates finish in a compile, not
+\(\mathrm{Sat}(\Phi_{\text{func}})\). Restoring a temporary relaxation is
+future work: re-running \(V\), re-checking \(\mathcal{B}\), or re-searching
+under the tight bounds.
+
+\paragraph{Unbounded Verification.}
+\textsc{IntC}'s claim is \(\models_K\). An unbounded proof of a stateful
+component is the invariant-and-abstraction obligation Ivy discharges by
+restructuring into a decidable
+fragment~\cite{padon2016ivy,padon2017paxosepr}. Carrying that obligation
+on a candidate, rather than stopping at \(K\), is future work.
+
+\paragraph{Where to Spend Compilation Time.}
+\textsc{IntC} runs \(V\) before it measures \(\mathcal{O}\), so a
+candidate can consume a timeout before a cheap profile would have
+dropped it. Other schedules over the same \(\mathrm{Gen}\) include
+estimating \(\mathcal{O}\) first, running a cheap \(\models_K\) before a
+longer query, and keeping candidates and proofs as artifacts so a later
+compile reuses them.
+
+\paragraph{A Score that Predicts \(V\).}
+\textsc{IntC}'s TheoryLower score orders descent, and against CBMC time it
+has Spearman's \(\rho = 0.11\). A score that prefers the rewrite expected
+to shorten the query has to be fit to this \(V\), and predicting SMT and
+verifier runtime from goal or program structure is already
+studied~\cite{healy2017where4,leeson2022graves}.
+
+\paragraph{Language Models as Compiler Inputs.}
+\label{sec:discussion_lm}
+A model can be the untrusted \(\mathrm{Gen}\) of
+Theorem~\ref{thm:restricted} at compile
+time~\cite{taneja2025llmvectorizer,fang2026llmveriopt,jiang2026segabench},
+or, for a deterministic compile, help write the catalogs, TheoryLower
+scores, and benchmarks an instance enumerates. It can also help with the
+specification burden of writing \(\Phi\) by drafting
+\(\Phi_{\text{func}}\) from a prose
+requirement~\cite{ma2025specgen,ugare2026fun2spec} as a candidate for
+\(V\), and by helping write the baseline \(P_1\). \textsc{IntC} is the prototype
+for a C instance; a model can help instantiate those inputs for another
+language.
+
+\paragraph{Language Models as Developers.}
+Professional developers commonly use AI tools on coding tasks: 51\%
+report daily use in the 2025 Stack Overflow
+survey~\cite{stackoverflow2025ai}, including multi-turn conversations on
+real GitHub work~\cite{hao2024chatgpt}. Later rewrites in that setting
+often break requirements that earlier turns had already
+met~\cite{huang2026regression,yan2026slump}.
+\textsc{IntentCompile} takes those requirements as a checkable
+\(\Phi\) and the program as \(P_1\), which a model can
+fill~\cite{lahiri2026intent}. The next rewrite is then a compile against
+\(\Phi\). Named requirements change when intent changes, which is less
+often than the program is rewritten, so a human can maintain \(\Phi\)
+while the model rewrites \(P\).
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+An as-if compiler preserves the source, including incidental choices the
+requirements do not fix, so it may omit a cheaper legal program.
+\textsc{IntentCompile} takes a baseline and a checkable contract,
+generates candidates, and admits those a sound verifier proves. It ranks
+the admitted set by \(\mathcal{O}\) under the same lowering backend that
+compiled \(P_1\), and emits \(P_1\) when no admitted candidate is cheaper.
+\textsc{IntC} is a prototype C instance of that restricted compiler.
+
+On the motivating example, \textsc{IntC} admits the 1024-cell ring that
+MSVC~\texttt{/O2} will not emit from a 1000-cell remainder. On extracts
+whose contracts name a benchmark, the emit is cheaper on \(\mathcal{O}\)
+than \(P_1\) or is \(P_1\). The catalogs, the bound \(K\), and writing
+\(\Phi\) from intent are the limits of \textsc{IntC}.

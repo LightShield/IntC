@@ -1,0 +1,14 @@
+name: ringbuffer-cegis-unknown
+baseline: baseline.c
+parameters:
+  - name: CAPACITY
+    bits: 64
+    constraints: ["CAPACITY >= 1000", "CAPACITY <= 1048576"]
+harnesses:
+  - file: harness_fifo.c
+    entry: harness
+    unwind: 8
+    defines: {K: "4"}
+    note: Same FIFO harness as CI. The timeout is too short for a proof, so V returns unknown.
+budget: {}
+verify_timeout_s: 0.2
